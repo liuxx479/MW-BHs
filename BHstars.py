@@ -8,6 +8,7 @@ import os
 
 plot_color = 0
 plot_highV_spec = 0
+plot_kgiant_spec = 1
 
 hdulist = pyfits.open('allStar-l30e.2.fits')
 idx_all=where( (hdulist[1].data['LOCATION_ID']>1))[0]
@@ -16,10 +17,11 @@ idx_noTelluric=where( (hdulist[1].data['LOCATION_ID']>1) & logical_not (hdulist[
 rvCC = hdulist[1].data['RV_CCFWHM']
 rvAUTO = hdulist[1].data['RV_AUTOFWHM']
 
-def download(ii, download=1):
+def download(ii, dodownload=1):
     LOCATION_ID = hdulist[1].data['LOCATION_ID'][ii]
     FILE = hdulist[1].data['FILE'][ii]   
-    if download and not os.path.isfile('spec/'+FILE):
+    if dodownload and not os.path.isfile('spec/'+FILE):
+        print 'downloading'
         bashCommand = 'wget  https://data.sdss.org/sas/dr13/apogee/spectro/redux/r6/stars/apo25m/%s/%s; mv %s spec'%(LOCATION_ID, FILE, FILE)#--spider
         os.system(bashCommand)
     return LOCATION_ID, FILE
@@ -153,4 +155,50 @@ if plot_highV_spec:
         except Exception:
             print ii
             pass
-        
+
+classes = hdulist[1].data['ASPCAP_CLASS']
+unique_classes = unique(classes)
+cut_telluric =logical_not (hdulist[1].data['APOGEE_TARGET2'] & 2**9)
+cut_logg     =(hdulist[1].data['LOGG']<3.8) & (hdulist[1].data['LOGG']>-10)
+cut_teff     =(hdulist[1].data['TEFF']<5000) 
+cut_JK       =(hdulist[1].data['J']-hdulist[1].data['K'] > 0.5)
+cut_class    =(classes=='GKg_a')+(classes=='GKg_b')+(classes=='GKg_c')+(classes=='GKg_d')
+cut_velocity =     (hdulist[1].data['RV_CCFWHM']>30.0)    
+idx_class_Teff_JK_LOGG38 = where(cut_telluric & cut_class & cut_teff & cut_JK & cut_logg & cut_velocity)[0]
+
+if plot_kgiant_spec:
+    #file_arr=array([download(ii, download=1) for ii in idx_high_noTelluric])
+    filename_arr = hdulist[1].data['FILE'][idx_class_Teff_JK_LOGG38]
+    for ii in arange(len(filename_arr)):#arange(5):#
+        print ii
+        ifile=filename_arr[ii]
+        FWHM = hdulist[1].data['RV_CCFWHM'][idx_class_Teff_JK_LOGG38][ii]
+        #yes_young = (hdulist[1].data['APOGEE_TARGET2'][idx_high_noTelluric][ii] & 2**13)
+        figname='kgiant/FWHM%05d_%s.png'%(FWHM, ifile[:-5])
+        if not os.path.isfile(figname): #or ii in[247,248,668,709,710,711,712,714,793,800,957]:
+            try:
+                download(idx_class_Teff_JK_LOGG38[ii], dodownload=1) 
+                
+                iwave, ispec = read_spec(ifile)
+                idx1=where((iwave>15500)&(iwave<15600))
+                idx2=where((iwave>16000)&(iwave<16100))
+                f=figure(figsize=(10,6))
+                ax1=f.add_subplot(311)
+                ax2=f.add_subplot(312)
+                ax3=f.add_subplot(313)
+                ax1.plot(iwave,ispec)
+                ax1.set_ylabel('Flux')        
+                ax2.set_ylabel('Flux')
+                ax3.set_ylabel('Flux')
+                #ax2.set_xlim (15500, 15600)
+                ax2.plot(iwave[idx1],ispec[idx1])
+                ax3.plot(iwave[idx2],ispec[idx2])        
+                ax3.set_xlabel('Wavelenght A')
+                ax1.set_title('%s     %.1fkm/s'%(ifile[:-5],FWHM))
+                plt.tight_layout()
+                savefig(figname)
+                close()
+            except Exception:
+                print 'Exception:',ii
+                pass
+                
