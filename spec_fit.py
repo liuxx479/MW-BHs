@@ -84,7 +84,7 @@ def fit_visits (iapodid, N=3):
     popt, pcov, model_specs = out
     return data_spec_arr, data_err_arr, single_spec, model_specs, vhelio_arr, date_arr, popt_single, popt, pcov
 
-def plot_visit_fits (iapoid, out3, out10, ishow=1):
+def plot_visit_fits (iapoid, out3, out10, ishow=0):
     data_spec_arr, data_err_arr, single_spec, model_specs3, vhelio_arr, date_arr, popt_single, popt3, pcov = out3
     data_spec_arr, data_err_arr, single_spec, model_specs10, vhelio_arr, date_arr, popt_single, popt10, pcov = out10
     istep=0.3
