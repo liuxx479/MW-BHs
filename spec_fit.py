@@ -67,7 +67,7 @@ def prep_visit_spec(iapoid):
     return data_spec_arr, data_err_arr, vhelio_arr, date_arr
     #return out_arr
 
-def fit_visits (iapodid, N=3):
+def fit_visits (iapoid, N=3):
     data_spec_arr, data_err_arr, vhelio_arr,date_arr = prep_visit_spec(iapoid)
     
     p0, pcov, test1_spec = fitting.fit_normalized_spectrum_single_star_model(norm_spec=data_spec_arr[0], 
