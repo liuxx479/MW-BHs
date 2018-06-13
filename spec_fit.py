@@ -14,6 +14,8 @@ from scipy.interpolate import interp1d
 import os, sys
 #from apogee.spec import continuum
 from emcee.utils import MPIPool 
+import matplotlib
+matplotlib.use('Agg')
 
 apodir = '/work/02977/jialiu/ApogeeLine/'
 
@@ -72,21 +74,31 @@ def fit_visits (iapoid, N=3):
     
     p0, pcov, test1_spec = fitting.fit_normalized_spectrum_single_star_model(norm_spec=data_spec_arr[0], 
                     spec_err=data_err_arr[0], NN_coeffs_norm = NN_coeffs_norm, NN_coeffs_flux = NN_coeffs_flux, 
-                    p0 = None, num_p0 = 1)
+                    p0 = None, num_p0 = 2)
     
-    popt_single, pcov, single_spec = fitting.fit_visit_spectra_single_star_model(norm_spectra=data_spec_arr, 
+    popt_single, pcov, single_spec = fitting.fit_visit_spectra_sb1_model(norm_spectra=data_spec_arr, 
                     spec_errs=data_err_arr, NN_coeffs_norm = NN_coeffs_norm, NN_coeffs_flux = NN_coeffs_flux, 
-                    v_helios=vhelio_arr, p0 = p0, num_p0 = 1)
+                    v_helios=vhelio_arr, p0 = p0, num_p0 = 5)
     
     out = fitting.fit_visit_spectra_N(norm_spectra=data_spec_arr, spec_errs=data_err_arr, NN_coeffs_norm = NN_coeffs_norm, 
                           NN_coeffs_flux = NN_coeffs_flux, NN_coeffs_R = NN_coeffs_R, NN_coeffs_Teff2_logg2 = NN_coeffs_Teff2_logg2, 
                           v_helios=vhelio_arr, p0_single=popt_single,N=N)
     popt, pcov, model_specs = out
-    return data_spec_arr, data_err_arr, single_spec, model_specs, vhelio_arr, date_arr, popt_single, popt, pcov
+    ############## add Teff and logg for secondaries
+    q2arr=zeros(shape=(N,5))
+    Teff1, logg1, feh, alphafe, vmacro1, dv1 = popt[:6]
+    q2arr[0] = [1, Teff1, logg1, vmacro1, dv1]#
+    for n in range(N-1): ## compute the Teff and logg for additional componenets
+        q, vmacro2, dv2 = popt[6+n*3:9+n*3]
+        Teff2, logg2 = spectral_model.get_Teff2_logg2_NN(labels = [Teff1, logg1, feh, q], 
+        NN_coeffs_Teff2_logg2 = NN_coeffs_Teff2_logg2)
+        q2arr[n+1] = [q, Teff2, logg2, vmacro2, dv2]#
+        
+    return data_spec_arr, data_err_arr, single_spec, model_specs, vhelio_arr, date_arr, popt_single, popt, pcov, q2arr
 
 def plot_visit_fits (iapoid, out3, out10, ishow=0):
-    data_spec_arr, data_err_arr, single_spec, model_specs3, vhelio_arr, date_arr, popt_single, popt3, pcov = out3
-    data_spec_arr, data_err_arr, single_spec, model_specs10, vhelio_arr, date_arr, popt_single, popt10, pcov = out10
+    data_spec_arr, data_err_arr, single_spec, model_specs3, vhelio_arr, date_arr, popt_single, popt3, pcov, q2arr = out3
+    data_spec_arr, data_err_arr, single_spec, model_specs10, vhelio_arr, date_arr, popt_single, popt10, pcov, q2arr = out10
     istep=0.3
     ledges = [[15140, 15810], [15850, 16435], [16470,16955]]
     dof = [len(array(data_spec_arr).flatten())+ ix for ix in (len(popt_single), len(popt3), len(popt10))]
@@ -165,11 +177,12 @@ def process_MS_visit_fits(iapoid):
         out = fit_visits(iapoid, N=iN)
         out_arr.append(out)
         ### save to files
-        data_spec_arr, data_err_arr, single_spec, model_specs, vhelio_arr, date_arr, popt_single, popt, pcov = out
+        data_spec_arr, data_err_arr, single_spec, model_specs, vhelio_arr, date_arr, popt_single, popt, pcov, q2arr = out
         save(apodir+'specs_fit/%s/%s_N%i_specs.npy'%(iapoid,iapoid, iN), 
              [data_spec_arr, data_err_arr, single_spec, model_specs])
         save(apodir+'specs_fit/%s/%s_N%i_params.npy'%(iapoid,iapoid, iN), popt)
         save(apodir+'specs_fit/%s/%s_N%i_cov.npy'%(iapoid,iapoid, iN), pcov)
+        save(apodir+'specs_fit/%s/%s_N%i_components.npy'%(iapoid,iapoid, iN), q2arr)
         if iN ==2:
             save(apodir+'specs_fit/%s/%s_vhelio.npy'%(iapoid,iapoid), vhelio_arr)        
             save(apodir+'specs_fit/%s/%s_date.npy'%(iapoid,iapoid), date_arr)
