@@ -159,20 +159,21 @@ def plot_visit_fits (iapoid, out3, out10, ishow=0):
 def process_MS_visit_fits(iapoid):
     'process all the MS visit spec, takes a loooong time'
     out_arr = []
+    os.system('mkdir -pv %s/specs_fit/%s'%(apodir,iapoid))
     for iN in (2,3,5,10):
         print iapoid, iN
         out = fit_visits(iapoid, N=iN)
         out_arr.append(out)
         ### save to files
         data_spec_arr, data_err_arr, single_spec, model_specs, vhelio_arr, date_arr, popt_single, popt, pcov = out
-        save(apodir+'specs_fit/%s_N%i_specs.npy'%(iapoid, iN), 
+        save(apodir+'specs_fit/%s/%s_N%i_specs.npy'%(iapoid,iapoid, iN), 
              [data_spec_arr, data_err_arr, single_spec, model_specs])
-        save(apodir+'specs_fit/%s_N%i_params.npy'%(iapoid, iN), popt)
-        save(apodir+'specs_fit/%s_N%i_cov.npy'%(iapoid, iN), pcov)
+        save(apodir+'specs_fit/%s/%s_N%i_params.npy'%(iapoid,iapoid, iN), popt)
+        save(apodir+'specs_fit/%s/%s_N%i_cov.npy'%(iapoid,iapoid, iN), pcov)
         if iN ==2:
-            save(apodir+'specs_fit/%s_vhelio.npy'%(iapoid), vhelio_arr)        
-            save(apodir+'specs_fit/%s_date.npy'%(iapoid), date_arr)
-            save(apodir+'specs_fit/%s_N1_params.npy'%(iapoid), popt_single)
+            save(apodir+'specs_fit/%s/%s_vhelio.npy'%(iapoid,iapoid), vhelio_arr)        
+            save(apodir+'specs_fit/%s/%s_date.npy'%(iapoid,iapoid), date_arr)
+            save(apodir+'specs_fit/%s/%s_N1_params.npy'%(iapoid,iapoid), popt_single)
     plot_visit_fits (iapoid, out_arr[1], out_arr[-1], ishow=0)
     
 pool=MPIPool()
@@ -180,7 +181,7 @@ if not pool.is_master():
     pool.wait()
     sys.exit(0)
 
-apoid_candidates = os.listdir(apodir+'specs_visit/MS')    
+apoid_candidates = os.listdir(apodir+'specs_visit/') 
 pool.map(process_MS_visit_fits, apoid_candidates)
 pool.close()
 
