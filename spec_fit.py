@@ -62,8 +62,8 @@ def prep_normed_spec (ifitsfn):
     return data_spec, specerr, ivhelio, idate
     
 def prep_visit_spec(iapoid):
-    fitsfn_arr = [apodir+'specs_visit/MS/%s/%s'%(iapoid, ifn) 
-                  for ifn in os.listdir(apodir+'specs_visit/MS/%s'%(iapoid))]
+    fitsfn_arr = [apodir+'specs_visit/%s/%s'%(iapoid, ifn) 
+                  for ifn in os.listdir(apodir+'specs_visit/%s'%(iapoid))]
     out_arr = map(prep_normed_spec, fitsfn_arr)
     data_spec_arr,data_err_arr,vhelio_arr,date_arr  = [[ivisit[i] for ivisit in out_arr] for i in range(4)]
     return data_spec_arr, data_err_arr, vhelio_arr, date_arr
@@ -85,14 +85,14 @@ def fit_visits (iapoid, N=3):
                           v_helios=vhelio_arr, p0_single=popt_single,N=N)
     popt, pcov, model_specs = out
     ############## add Teff and logg for secondaries
-    q2arr=zeros(shape=(N,5))
+    q2arr=zeros(shape=(N,4))
     Teff1, logg1, feh, alphafe, vmacro1, dv1 = popt[:6]
-    q2arr[0] = [1, Teff1, logg1, vmacro1, dv1]#
+    q2arr[0] = [1, Teff1, logg1, vmacro1]#
     for n in range(N-1): ## compute the Teff and logg for additional componenets
         q, vmacro2, dv2 = popt[6+n*3:9+n*3]
         Teff2, logg2 = spectral_model.get_Teff2_logg2_NN(labels = [Teff1, logg1, feh, q], 
         NN_coeffs_Teff2_logg2 = NN_coeffs_Teff2_logg2)
-        q2arr[n+1] = [q, Teff2, logg2, vmacro2, dv2]#
+        q2arr[n+1] = [q, Teff2, logg2, vmacro2]#
         
     return data_spec_arr, data_err_arr, single_spec, model_specs, vhelio_arr, date_arr, popt_single, popt, pcov, q2arr
 
