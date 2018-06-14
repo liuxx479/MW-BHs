@@ -82,7 +82,7 @@ def fit_visits (iapoid, N=3):
     
     out = fitting.fit_visit_spectra_N(norm_spectra=data_spec_arr, spec_errs=data_err_arr, NN_coeffs_norm = NN_coeffs_norm, 
                           NN_coeffs_flux = NN_coeffs_flux, NN_coeffs_R = NN_coeffs_R, NN_coeffs_Teff2_logg2 = NN_coeffs_Teff2_logg2, 
-                          v_helios=vhelio_arr, p0_single=popt_single,N=N)
+                          v_helios=vhelio_arr, p0_single=popt_single[:6],N=N)
     popt, pcov, model_specs = out
     ############## add Teff and logg for secondaries
     q2arr=zeros(shape=(N,4))
