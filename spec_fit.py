@@ -96,9 +96,10 @@ def fit_visits (iapoid, N=3):
         
     return data_spec_arr, data_err_arr, single_spec, model_specs, vhelio_arr, date_arr, popt_single, popt, pcov, q2arr
 
-def plot_visit_fits (iapoid, out3, out10, ishow=0):
-    data_spec_arr, data_err_arr, single_spec, model_specs3, vhelio_arr, date_arr, popt_single, popt3, pcov, q2arr = out3
-    data_spec_arr, data_err_arr, single_spec, model_specs10, vhelio_arr, date_arr, popt_single, popt10, pcov, q2arr = out10
+def plot_visit_fits (iapoid, data_spec_arr, data_err_arr, single_spec, model_specs3, model_specs10, 
+                     date_arr, popt_single, popt3, popt10, ishow=0):
+    #data_spec_arr, data_err_arr, single_spec, model_specs3, vhelio_arr, date_arr, popt_single, popt3, pcov, q2arr = out3
+    #data_spec_arr, data_err_arr, single_spec, model_specs10, vhelio_arr, date_arr, popt_single, popt10, pcov, q2arr = out10
     istep=0.3
     ledges = [[15140, 15810], [15850, 16435], [16470,16955]]
     dof = [len(array(data_spec_arr).flatten())+ ix for ix in (len(popt_single), len(popt3), len(popt10))]
@@ -170,8 +171,19 @@ def plot_visit_fits (iapoid, out3, out10, ishow=0):
         
 def process_MS_visit_fits(iapoid):
     'process all the MS visit spec, takes a loooong time'
-    if iapoid[0]!='2' or os.path.isfile(apodir+'specs_fit/%s/%s_N10_components.npy'%(iapoid,iapoid)):
+    if iapoid[0]!='2':
         return 0 ## not a valid file
+    if os.path.isfile(apodir+'specs_fit/%s/%s_N10_components.npy'%(iapoid,iapoid)):
+        ######### fit already processed:
+        #data_spec_arr, data_err_arr, single_spec, model_specs3, date_arr, popt_single, popt3, 
+        data_spec_arr, data_err_arr, single_spec, model_specs3 = load(apodir+'specs_fit/%s/%s_N3_specs.npy'%(iapoid,iapoid))
+        data_spec_arr, data_err_arr, single_spec, model_specs10 = load(apodir+'specs_fit/%s/%s_N10_specs.npy'%(iapoid,iapoid))
+        popt3=load(apodir+'specs_fit/%s/%s_N%i_params.npy'%(iapoid,iapoid, 3))
+        popt10=load(apodir+'specs_fit/%s/%s_N%i_params.npy'%(iapoid,iapoid, 10))
+        popt_single=load(apodir+'specs_fit/%s/%s_N1_params.npy'%(iapoid,iapoid))
+        date_arr=load(apodir+'specs_fit/%s/%s_date.npy'%(iapoid,iapoid))
+        plot_visit_fits (iapoid, data_spec_arr, data_err_arr, single_spec, model_specs3, model_specs10, 
+                     date_arr, popt_single, popt3, popt10)
     out_arr = []
     os.system('mkdir -pv %s/specs_fit/%s'%(apodir,iapoid))
     for iN in (2,3,5,10):
@@ -189,8 +201,8 @@ def process_MS_visit_fits(iapoid):
             save(apodir+'specs_fit/%s/%s_vhelio.npy'%(iapoid,iapoid), vhelio_arr)        
             save(apodir+'specs_fit/%s/%s_date.npy'%(iapoid,iapoid), date_arr)
             save(apodir+'specs_fit/%s/%s_N1_params.npy'%(iapoid,iapoid), popt_single)
-    plot_visit_fits (iapoid, out_arr[1], out_arr[-1], ishow=0)
-    
+    #plot_visit_fits (iapoid, out_arr[1], out_arr[-1], ishow=0)
+
 pool=MPIPool()
 if not pool.is_master():
     pool.wait()
