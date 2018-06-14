@@ -126,7 +126,7 @@ def plot_visit_fits (iapoid, data_spec_arr, data_err_arr, single_spec, model_spe
                 axes[i].plot(wavelength[m], j*istep+N10_spec[m], color='g', lw=0.5)
 
             axes[i].set_xlim(ledges[i])
-            axes[i].set_ylim(0.7, len(spec_fitted)*istep+1)
+            axes[i].set_ylim(0.7, len(data_spec)*istep+1)
     axes[0].legend(loc = 'best', frameon = 1, fontsize= 6, ncol=len(date_arr)/10+1)
     axes[1].set_ylabel('Normalized Flux')
     axes[-1].set_xlabel('Wavelenght A')
@@ -147,7 +147,7 @@ def plot_visit_fits (iapoid, data_spec_arr, data_err_arr, single_spec, model_spe
             m = (wavelength > ledges[i][0]) & (wavelength < ledges[i][1]) 
             axes[i].fill_between(wavelength[m], j*istep+1-specerr[m], j*istep+1+specerr[m], color='k',alpha=0.2)
             axes[i].plot(wavelength[m], j*istep+ones(sum(m)), color='k', lw=1, label = '%s'%(date_arr[j]))
-            if j==len(spec_fitted)-1:  
+            if j==len(data_spec)-1:  
                 axes[i].plot(wavelength[m], j*istep+N1_spec[m]/data_spec[m], color='b', lw=0.3, label = 'N=1(%.2f)'%(chi1))
                 axes[i].plot(wavelength[m], j*istep+N3_spec[m]/data_spec[m], color='r', lw=0.3, label = 'N=3(%.2f)'%(chi3))
                 axes[i].plot(wavelength[m], j*istep+N10_spec[m]/data_spec[m], color='g', lw=0.3, label = 'N=10(%.2f)'%(chi10))
@@ -157,7 +157,7 @@ def plot_visit_fits (iapoid, data_spec_arr, data_err_arr, single_spec, model_spe
                 axes[i].plot(wavelength[m], j*istep+N10_spec[m]/data_spec[m], color='g', lw=0.3)
 
             axes[i].set_xlim(ledges[i])
-            axes[i].set_ylim(0.7, len(spec_fitted)*istep+1)
+            axes[i].set_ylim(0.7, len(data_spec)*istep+1)
     axes[0].legend(loc = 'best', frameon = 1, fontsize= 6,ncol=len(date_arr)/10+1)
     axes[1].set_ylabel('Flux_model / Flux_data')
     axes[-1].set_xlabel('Wavelenght A')
