@@ -115,7 +115,7 @@ def plot_visit_fits (iapoid, out3, out10, ishow=0):
             m = (wavelength > ledges[i][0]) & (wavelength < ledges[i][1]) 
             axes[i].fill_between(wavelength[m], j*istep+data_spec[m]-specerr[m], j*istep+data_spec[m]+specerr[m], color='k',alpha=0.1)
             axes[i].plot(wavelength[m], j*istep+data_spec[m], color='k', lw=0.5, label = '%s'%(date_arr[j]))
-            if j==len(spec_fitted)-1:
+            if j==len(date_arr)-1:
                 axes[i].plot(wavelength[m], j*istep+N1_spec[m], color='b', lw=0.5, label = 'N=1(%.2f)'%(chi1))
                 axes[i].plot(wavelength[m], j*istep+N3_spec[m], color='r', lw=0.5, label = 'N=3(%.2f)'%(chi3))
                 axes[i].plot(wavelength[m], j*istep+N10_spec[m], color='g', lw=0.5, label = 'N=10(%.2f)'%(chi10))
