@@ -170,6 +170,8 @@ def plot_visit_fits (iapoid, out3, out10, ishow=0):
         
 def process_MS_visit_fits(iapoid):
     'process all the MS visit spec, takes a loooong time'
+    if iapoid[0]!='2':
+        return 0 ## not a valid file
     out_arr = []
     os.system('mkdir -pv %s/specs_fit/%s'%(apodir,iapoid))
     for iN in (2,3,5,10):
