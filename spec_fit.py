@@ -50,7 +50,7 @@ print batchname, 'total candidates: %s'%(len(apoid_candidates))
 #hdulist_visit = fits.open(apodir+'allVisit-l31c.2.fits')
 #out = [hdulist_visit[1].data[x] for x in ['APOGEE_ID','PLATE','MJD','FILE']]
 #save('ID_PLATE_MJD_FILE.npy',array(out).T)
-APOGEE_ID, PLATE, MJD, FILE = load(apodir+'ID_PLATE_MJD_FILE.npy')
+APOGEE_ID, PLATE, MJD, FILE = load(apodir+'ID_PLATE_MJD_FILE.npy').T
 
 def specfn(params):
     iplate,imjd,ifn = params
