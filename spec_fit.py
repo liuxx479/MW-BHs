@@ -54,7 +54,9 @@ APOGEE_ID, PLATE, MJD, FILE = load(apodir+'ID_PLATE_MJD_FILE.npy').T
 
 def specfn(params):
     iplate,imjd,ifn = params
-    return '/scratch/02977/jialiu/ApogeeLine/apo25m/{0}/{1}/{2}'.format(iplate,imjd,ifn)  
+    out = '/scratch/02977/jialiu/ApogeeLine/apo25m/{0}/{1}/{2}'.format(iplate,imjd,ifn) 
+    out.replace(" ", "")
+    return  out
 
 # read in all individual neural networks we'll need. 
 NN_coeffs_norm = utils.read_in_neural_network(name = 'normalized_spectra')
