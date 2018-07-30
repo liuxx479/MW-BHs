@@ -45,7 +45,7 @@ os.system('mkdir -pv '+fitparams_dir)
 os.system('mkdir -pv '+fitspecs_dir)
 
 
-print batchname, 'total candidates: %s (%s-%s)'%(len(apoid_candidates), Nchunk*int(batch), Nchunk*(int(batch)+1))
+print batchname, 'total candidates: %s'%(len(apoid_candidates)
 
 hdulist_visit = fits.open(apodir+'allVisit-l31c.2.fits')
 
