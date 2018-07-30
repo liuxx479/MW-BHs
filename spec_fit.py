@@ -31,13 +31,18 @@ print batch
 
 if batch == 'lachlan':
     apoid_candidates = load(apodir+'overly_bright_ids_filt.npy').T[0]
-    
+    batchname = 'dwarfs_lachlan'
 else: ## batch = 0,1,2,3,..9, chop up the data into 10 chunks for analysis
     all_giants = load(apodir+'APOGEE_ID_giants_goodpara.npy')
     Nchunk = len(all_giants)/10+1
     apoid_candidates = all_giants[Nchunk*int(batch):Nchunk*(int(batch)+1)]
-batchname = 'batch_giants'+batch
-print batchname, 'total candidates:', len(apoid_candidates), Nchunk*int(batch), Nchunk*(int(batch)+1)
+    batchname = 'giants_'+batch
+
+fit_dir = apodir+'specs_fit/%s/'%(batchname)
+
+os.system('mkdir -pv '+fit_dir)
+
+print batchname, 'total candidates: %s (%s-%s)'%(len(apoid_candidates), Nchunk*int(batch), Nchunk*(int(batch)+1))
 
 hdulist_visit = fits.open(apodir+'allVisit-l31c.2.fits')
 
