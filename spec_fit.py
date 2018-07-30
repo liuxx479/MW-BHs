@@ -38,9 +38,12 @@ else: ## batch = 0,1,2,3,..9, chop up the data into 10 chunks for analysis
     apoid_candidates = all_giants[Nchunk*int(batch):Nchunk*(int(batch)+1)]
     batchname = 'giants_'+batch
 
-fit_dir = apodir+'specs_fit/%s/'%(batchname)
+fitparams_dir = apodir+'specs_fit_params/%s/'%(batchname)
+fitspecs_dir = apodir+'specs_fit_specs/%s/'%(batchname)
 
-os.system('mkdir -pv '+fit_dir)
+os.system('mkdir -pv '+fitparams_dir)
+os.system('mkdir -pv '+fitspecs_dir)
+
 
 print batchname, 'total candidates: %s (%s-%s)'%(len(apoid_candidates), Nchunk*int(batch), Nchunk*(int(batch)+1))
 
@@ -199,35 +202,35 @@ def process_MS_visit_fits(iapoid):
     'process all the MS visit spec, takes a loooong time'
     if iapoid[0]!='2':
         return 0 ## not a valid file
-    if os.path.isfile(apodir+'specs_fit/%s/%s_N10_components.npy'%(iapoid,iapoid)):
+    if os.path.isfile(fitparams_dir+'%s/%s_N%i_components.npy'%(iapoid,iapoid, list_components[-1])):
         ######### fit already processed:
         #data_spec_arr, data_err_arr, single_spec, model_specs3, date_arr, popt_single, popt3, 
-        data_spec_arr, data_err_arr, single_spec, model_specs3 = load(apodir+'specs_fit/%s/%s_N3_specs.npy'%(iapoid,iapoid))
-        data_spec_arr, data_err_arr, single_spec, model_specs10 = load(apodir+'specs_fit/%s/%s_N10_specs.npy'%(iapoid,iapoid))
-        popt3=load(apodir+'specs_fit/%s/%s_N%i_params.npy'%(iapoid,iapoid, 3))
-        popt10=load(apodir+'specs_fit/%s/%s_N%i_params.npy'%(iapoid,iapoid, 10))
-        popt_single=load(apodir+'specs_fit/%s/%s_N1_params.npy'%(iapoid,iapoid))
-        date_arr=load(apodir+'specs_fit/%s/%s_date.npy'%(iapoid,iapoid))
-        plot_visit_fits (iapoid, data_spec_arr, data_err_arr, single_spec, model_specs3, model_specs10, 
-                     date_arr, popt_single, popt3, popt10)
+        data_spec_arr, data_err_arr, single_spec, model_specs3 = load(fitspecs_dir+'%s/%s_N3_specs.npy'%(iapoid,iapoid))
+        data_spec_arr, data_err_arr, single_spec, model_specs10 = load(fitspecs_dir+'%s/%s_N10_specs.npy'%(iapoid,iapoid))
+        popt3=load(fitparams_dir+'%s/%s_N%i_params.npy'%(iapoid,iapoid, 3))
+        #popt10=load(fitparams_dir+'%s/%s_N%i_params.npy'%(iapoid,iapoid, 10))
+        popt_single=load(fitparams_dir+'%s/%s_N1_params.npy'%(iapoid,iapoid))
+        date_arr=load(fitparams_dir+'%s/%s_date.npy'%(iapoid,iapoid))
+        #plot_visit_fits (iapoid, data_spec_arr, data_err_arr, single_spec, model_specs3, model_specs10, 
+        #             date_arr, popt_single, popt3, popt10)
     out_arr = []
-    os.system('mkdir -pv %s/specs_fit/%s'%(apodir,iapoid))
+    os.system('mkdir -pv %s%s'%(fitparams_dir,iapoid))
+    os.system('mkdir -pv %s%s'%(fitspecs_dir,iapoid))
     for iN in list_components:
         print iapoid, iN
         out = fit_visits(iapoid, N=iN)
         out_arr.append(out)
         ### save to files
         data_spec_arr, data_err_arr, single_spec, model_specs, vhelio_arr, date_arr, popt_single, popt, pcov, q2arr = out
-        save(apodir+'specs_fit/%s/%s_N%i_specs.npy'%(iapoid,iapoid, iN), 
+        save(fitspecs_dir+'%s/%s_N%i_specs.npy'%(iapoid,iapoid, iN), 
              [data_spec_arr, data_err_arr, single_spec, model_specs])
-        save(apodir+'specs_fit/%s/%s_N%i_params.npy'%(iapoid,iapoid, iN), popt)
-        save(apodir+'specs_fit/%s/%s_N%i_cov.npy'%(iapoid,iapoid, iN), pcov)
-        save(apodir+'specs_fit/%s/%s_N%i_components.npy'%(iapoid,iapoid, iN), q2arr)
+        save(fitparams_dir+'%s/%s_N%i_params.npy'%(iapoid,iapoid, iN), popt)
+        save(fitparams_dir+'%s/%s_N%i_cov.npy'%(iapoid,iapoid, iN), pcov)
+        save(fitparams_dir+'%s/%s_N%i_components.npy'%(iapoid,iapoid, iN), q2arr)
         if iN ==2:
-            save(apodir+'specs_fit/%s/%s_vhelio.npy'%(iapoid,iapoid), vhelio_arr)        
-            save(apodir+'specs_fit/%s/%s_date.npy'%(iapoid,iapoid), date_arr)
-            save(apodir+'specs_fit/%s/%s_N1_params.npy'%(iapoid,iapoid), popt_single)
-    #plot_visit_fits (iapoid, out_arr[1], out_arr[-1], ishow=0)
+            save(fitparams_dir+'%s/%s_vhelio.npy'%(iapoid,iapoid), vhelio_arr)        
+            save(fitparams_dir+'%s/%s_date.npy'%(iapoid,iapoid), date_arr)
+            save(fitparams_dir+'%s/%s_N1_params.npy'%(iapoid,iapoid), popt_single)
 
 pool=MPIPool()
 if not pool.is_master():
