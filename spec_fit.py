@@ -47,7 +47,10 @@ os.system('mkdir -pv '+fitspecs_dir)
 
 print batchname, 'total candidates: %s'%(len(apoid_candidates))
 
-hdulist_visit = fits.open(apodir+'allVisit-l31c.2.fits')
+#hdulist_visit = fits.open(apodir+'allVisit-l31c.2.fits')
+#out = [hdulist_visit[1].data[x] for x in ['APOGEE_ID','PLATE','MJD','FILE']]
+#save('ID_PLATE_MJD_FILE.npy',array(out).T)
+APOGEE_ID, PLATE, MJD, FILE = load(apodir+'ID_PLATE_MJD_FILE.npy')
 
 def specfn(params):
     iplate,imjd,ifn = params
@@ -91,8 +94,11 @@ def prep_visit_spec(iapoid):
     '''
     For apogee objects with APOGEE_ID=iapoid, get the list of visit spectrum
     '''
-    idx_visit = where(hdulist_visit[1].data['APOGEE_ID']==iapoid)[0]
-    fitsfn_arr = [[hdulist_visit[1].data[x][iidx] for x in ['PLATE','MJD','FILE']] for iidx in idx_visit]
+    #idx_visit = where(hdulist_visit[1].data['APOGEE_ID']==iapoid)[0]
+    #fitsfnparams_arr = [[hdulist_visit[1].data[x][iidx] for x in ['PLATE','MJD','FILE']] for iidx in idx_visit]
+    idx_visit = where(APOGEE_ID==iapoid)[0]
+    fitsfnparams_arr = [[PLATE[iidx],MJD[iidx],FILE[iidx]] for iidx in idx_visit ]
+    fitsfn_arr = map(specfn, fitsfnparams_arr)
     out_arr = map(prep_normed_spec, fitsfn_arr)
     data_spec_arr,data_err_arr,vhelio_arr,date_arr  = [[ivisit[i] for ivisit in out_arr] for i in range(4)]
     return data_spec_arr, data_err_arr, vhelio_arr, date_arr
