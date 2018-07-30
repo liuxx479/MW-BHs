@@ -198,7 +198,7 @@ def plot_visit_fits (iapoid, data_spec_arr, data_err_arr, single_spec, model_spe
         savefig(apodir+'specs_fit_plot/MS_visit_joint_pdf/%s_diff.pdf'%(iapoid))
         close()
         
-def process_MS_visit_fits(iapoid):
+def process_visit_fits(iapoid):
     'process all the MS visit spec, takes a loooong time'
     if iapoid[0]!='2':
         return 0 ## not a valid file
@@ -237,7 +237,7 @@ if not pool.is_master():
     pool.wait()
     sys.exit(0)
 
-pool.map(process_MS_visit_fits, apoid_candidates)
+pool.map(process_visit_fits, apoid_candidates)
 pool.close()
 
 print 'done-done-done'
