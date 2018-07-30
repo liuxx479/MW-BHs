@@ -18,12 +18,32 @@ import matplotlib
 matplotlib.use('Agg')
 
 apodir = '/work/02977/jialiu/ApogeeLine/'
-
 os.chdir(apodir+'binspec')
+list_components=[2,3,5] #[2,3,5,10]
 
 import utils
 import spectral_model
 import fitting
+
+############ new addition after Yuansen created new NN for giants
+batch = str(sys.argv[1])
+print batch
+
+if batch == 'lachlan':
+    apoid_candidates = load(apodir+'overly_bright_ids_filt.npy').T[0]
+    
+else: ## batch = 0,1,2,3,..9, chop up the data into 10 chunks for analysis
+    all_giants = load(apodir+'APOGEE_ID_giants_goodpara.npy')
+    Nchunk = len(all_giants)/10+1
+    apoid_candidates = all_giants[Nchunk*int(batch):Nchunk*(int(batch)+1)]
+batchname = 'batch_giants'+batch
+print batchname, 'total candidates:', len(apoid_candidates), Nchunk*int(batch), Nchunk*(int(batch)+1)
+
+hdulist_visit = fits.open(apodir+'allVisit-l31c.2.fits')
+
+def specfn(params):
+    iplate,imjd,ifn = params
+    return '/scratch/02977/jialiu/ApogeeLine/apo25m/{0}/{1}/{2}'.format(iplate,imjd,ifn)  
 
 # read in all individual neural networks we'll need. 
 NN_coeffs_norm = utils.read_in_neural_network(name = 'normalized_spectra')
@@ -31,7 +51,6 @@ NN_coeffs_flux = utils.read_in_neural_network(name = 'unnormalized_spectra')
 NN_coeffs_R = utils.read_in_neural_network(name = 'radius')
 NN_coeffs_Teff2_logg2 = utils.read_in_neural_network(name = 'Teff2_logg2')
 wavelength = utils.load_wavelength_array()
-
 
 def read_spec(fitsfile, get_vhelio=0):    
     ihdulist = fits.open(fitsfile)
@@ -50,7 +69,6 @@ def read_spec(fitsfile, get_vhelio=0):
     else:
         return ilambda, ispec, ierr, ipass, idate
 
-
 def prep_normed_spec (ifitsfn):
     ilambda, ispec, ierr, ipass, idate, ivhelio = read_spec(ifitsfn, get_vhelio=1)
     ierr[where(ipass==0)]*=100
@@ -62,8 +80,11 @@ def prep_normed_spec (ifitsfn):
     return data_spec, specerr, ivhelio, idate
     
 def prep_visit_spec(iapoid):
-    fitsfn_arr = [apodir+'specs_visit/%s/%s'%(iapoid, ifn) 
-                  for ifn in os.listdir(apodir+'specs_visit/%s'%(iapoid))]
+    '''
+    For apogee objects with APOGEE_ID=iapoid, get the list of visit spectrum
+    '''
+    idx_visit = where(hdulist_visit[1].data['APOGEE_ID']==iapoid)[0]
+    fitsfn_arr = [[hdulist_visit[1].data[x][iidx] for x in ['PLATE','MJD','FILE']] for iidx in idx_visit]
     out_arr = map(prep_normed_spec, fitsfn_arr)
     data_spec_arr,data_err_arr,vhelio_arr,date_arr  = [[ivisit[i] for ivisit in out_arr] for i in range(4)]
     return data_spec_arr, data_err_arr, vhelio_arr, date_arr
@@ -186,7 +207,7 @@ def process_MS_visit_fits(iapoid):
                      date_arr, popt_single, popt3, popt10)
     out_arr = []
     os.system('mkdir -pv %s/specs_fit/%s'%(apodir,iapoid))
-    for iN in (2,3,5,10):
+    for iN in list_components:
         print iapoid, iN
         out = fit_visits(iapoid, N=iN)
         out_arr.append(out)
@@ -208,7 +229,6 @@ if not pool.is_master():
     pool.wait()
     sys.exit(0)
 
-apoid_candidates = os.listdir(apodir+'specs_visit/') 
 pool.map(process_MS_visit_fits, apoid_candidates)
 pool.close()
 
