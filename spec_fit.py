@@ -55,7 +55,8 @@ APOGEE_ID, PLATE, MJD, FILE = load(apodir+'ID_PLATE_MJD_FILE.npy').T
 def specfn(params):
     iplate,imjd,ifn = params
     out = '/scratch/02977/jialiu/ApogeeLine/apo25m/{0}/{1}/{2}'.format(iplate,imjd,ifn) 
-    out.replace(" ", "")
+    out=out.replace(" ", "")
+    #out.replace("\t", "")
     return  out
 
 # read in all individual neural networks we'll need. 
