@@ -31,7 +31,7 @@ print batch
 
 if batch == 'lachlan':
     apoid_candidates = load(apodir+'overly_bright_ids_filt.npy').T[0]
-    batchname = 'dwarfs_lachlan'
+    batchname = 'dwarfs_lachlan_kareemNN'
 else: ## batch = 0,1,2,3,..9, chop up the data into 10 chunks for analysis
     all_giants = load(apodir+'APOGEE_ID_giants_goodpara.npy')
     Nchunk = len(all_giants)/10+1
