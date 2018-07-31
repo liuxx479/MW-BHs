@@ -173,7 +173,7 @@ def plot_visit_fits (iapoid, data_spec_arr, data_err_arr, single_spec, model_spe
         show()
     else:
         savefig(apodir+'specs_fit_plot/MS_visit_joint/%s_fit.jpg'%(iapoid))
-        savefig(apodir+'specs_fit_plot/MS_visit_joint_pdf/%s_fit.pdf'%(iapoid))
+        #savefig(apodir+'specs_fit_plot/MS_visit_joint_pdf/%s_fit.pdf'%(iapoid))
         close()
 
 
@@ -204,7 +204,7 @@ def plot_visit_fits (iapoid, data_spec_arr, data_err_arr, single_spec, model_spe
         show()
     else:
         savefig(apodir+'specs_fit_plot/MS_visit_joint/%s_diff.jpg'%(iapoid))
-        savefig(apodir+'specs_fit_plot/MS_visit_joint_pdf/%s_diff.pdf'%(iapoid))
+        #savefig(apodir+'specs_fit_plot/MS_visit_joint_pdf/%s_diff.pdf'%(iapoid))
         close()
         
 def process_visit_fits(iapoid):
@@ -227,6 +227,9 @@ def process_visit_fits(iapoid):
     os.system('mkdir -pv %s%s'%(fitspecs_dir,iapoid))
     for iN in list_components:
         print iapoid, iN
+        fn_components=fitparams_dir+'%s/%s_N%i_components.npy'%(iapoid,iapoid, iN)
+        if os.path.isfile(fn_components):
+            continue
         out = fit_visits(iapoid, N=iN)
         out_arr.append(out)
         ### save to files
@@ -235,7 +238,7 @@ def process_visit_fits(iapoid):
              [data_spec_arr, data_err_arr, single_spec, model_specs])
         save(fitparams_dir+'%s/%s_N%i_params.npy'%(iapoid,iapoid, iN), popt)
         save(fitparams_dir+'%s/%s_N%i_cov.npy'%(iapoid,iapoid, iN), pcov)
-        save(fitparams_dir+'%s/%s_N%i_components.npy'%(iapoid,iapoid, iN), q2arr)
+        save(fn_components, q2arr)
         if iN ==2:
             save(fitparams_dir+'%s/%s_vhelio.npy'%(iapoid,iapoid), vhelio_arr)        
             save(fitparams_dir+'%s/%s_date.npy'%(iapoid,iapoid), date_arr)
