@@ -214,6 +214,7 @@ def plot_visit_fits (iapoid, data_spec_arr, data_err_arr, single_spec, model_spe
 
 def plot_visit_fits_2comp (iapoid, data_spec_arr, data_err_arr, single_spec, model_specs2, 
                      date_arr, popt_single, popt2, ishow=0):
+    fnpath=apodir+'specs_fit_plot/MS_visit_joint/'
     istep=0.3
     ledges = [[15140, 15810], [15850, 16435], [16470,16955]]
     dof = [len(array(data_spec_arr).flatten())+ ix for ix in (len(popt_single), len(popt2))]
@@ -245,8 +246,8 @@ def plot_visit_fits_2comp (iapoid, data_spec_arr, data_err_arr, single_spec, mod
     if ishow: 
         show()
     else:
-        savefig(apodir+'specs_fit_plot/MS_visit_joint/%s_fit.jpg'%(iapoid))
-        #savefig(apodir+'specs_fit_plot/MS_visit_joint_pdf/%s_fit.pdf'%(iapoid))
+        fnfig2='%s_fit.jpg'%(iapoid)
+        savefig(fnpath+fnfig2)
         close()
 
 
@@ -274,10 +275,14 @@ def plot_visit_fits_2comp (iapoid, data_spec_arr, data_err_arr, single_spec, mod
     if ishow: 
         show()
     else:
-        savefig(apodir+'specs_fit_plot/MS_visit_joint/%s_diff.jpg'%(iapoid))
-        #savefig(apodir+'specs_fit_plot/MS_visit_joint_pdf/%s_diff.pdf'%(iapoid))
+        
+        fnfig2=fnpath+'%s_diff.jpg'%(iapoid)
+        savefig()
         close()
-    
+
+    print 'uploading to dropbox'
+    os.system('/work/02977/jialiu/Dropbox-Uploader/dropbox_uploader.sh upload %s %s'%(fnpath,fnfig1))
+    os.system('/work/02977/jialiu/Dropbox-Uploader/dropbox_uploader.sh upload %s %s'%(fnpath,fnfig2))
         
         
 def process_visit_fits(iapoid):
@@ -317,7 +322,8 @@ def process_visit_fits(iapoid):
             save(fitparams_dir+'%s/%s_date.npy'%(iapoid,iapoid), date_arr)
             save(fitparams_dir+'%s/%s_N1_params.npy'%(iapoid,iapoid), popt_single)
             ########## make a plot
-            plot_visit_fits_2comp (iapoid, data_spec_arr, data_err_arr, single_spec, model_specs, 
+            if batch == 'test':
+                plot_visit_fits_2comp (iapoid, data_spec_arr, data_err_arr, single_spec, model_specs, 
                      date_arr, popt_single, popt, ishow=0)
 
 pool=MPIPool()
