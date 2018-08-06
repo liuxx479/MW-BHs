@@ -232,7 +232,7 @@ def plot_visit_fits_2comp (iapoid, data_spec_arr, data_err_arr, single_spec, mod
             axes[i].plot(wavelength[m], j*istep+data_spec[m], color='k', lw=0.5, label = '%s'%(date_arr[j]))
             if j==len(date_arr)-1:
                 axes[i].plot(wavelength[m], j*istep+N1_spec[m], color='b', lw=0.5, label = 'N=1(%.2f)'%(chi1))
-                axes[i].plot(wavelength[m], j*istep+N2_spec[m], color='r', lw=0.5, label = 'N=2(%.2f)'%(chi3))
+                axes[i].plot(wavelength[m], j*istep+N2_spec[m], color='r', lw=0.5, label = 'N=2(%.2f)'%(chi2))
             else:
                 axes[i].plot(wavelength[m], j*istep+N1_spec[m], color='b', lw=0.5)
                 axes[i].plot(wavelength[m], j*istep+N2_spec[m], color='r', lw=0.5)
@@ -261,7 +261,7 @@ def plot_visit_fits_2comp (iapoid, data_spec_arr, data_err_arr, single_spec, mod
             axes[i].plot(wavelength[m], j*istep+ones(sum(m)), color='k', lw=1, label = '%s'%(date_arr[j]))
             if j==len(date_arr)-1:  
                 axes[i].plot(wavelength[m], j*istep+N1_spec[m]/data_spec[m], color='b', lw=0.3, label = 'N=1(%.2f)'%(chi1))
-                axes[i].plot(wavelength[m], j*istep+N2_spec[m]/data_spec[m], color='r', lw=0.3, label = 'N=2(%.2f)'%(chi3))
+                axes[i].plot(wavelength[m], j*istep+N2_spec[m]/data_spec[m], color='r', lw=0.3, label = 'N=2(%.2f)'%(chi2))
             else:
                 axes[i].plot(wavelength[m], j*istep+N1_spec[m]/data_spec[m], color='b', lw=0.3)
                 axes[i].plot(wavelength[m], j*istep+N2_spec[m]/data_spec[m], color='r', lw=0.3)
