@@ -19,7 +19,7 @@ matplotlib.use('Agg')
 
 apodir = '/work/02977/jialiu/ApogeeLine/'
 os.chdir(apodir+'binspec')
-list_components=[2,3,5] #[2,3,5,10]
+list_components=[2,]#3,5] #[2,3,5,10]
 
 import utils
 import spectral_model
@@ -32,6 +32,11 @@ print batch
 if batch == 'lachlan':
     apoid_candidates = load(apodir+'overly_bright_ids_filt.npy').T[0][::-1]
     batchname = 'dwarfs_lachlan_kareemNN'
+elif batch == 'test':
+    all_giants = load(apodir+'APOGEE_ID_giants_goodpara.npy')
+    apoid_candidates = all_giants[2000:2100]
+    batchname = 'giants_'+batch
+    
 else: ## batch = 0,1,2,3,..9, chop up the data into 10 chunks for analysis
     all_giants = load(apodir+'APOGEE_ID_giants_goodpara.npy')
     Nchunk = len(all_giants)/10+1
@@ -206,6 +211,74 @@ def plot_visit_fits (iapoid, data_spec_arr, data_err_arr, single_spec, model_spe
         savefig(apodir+'specs_fit_plot/MS_visit_joint/%s_diff.jpg'%(iapoid))
         #savefig(apodir+'specs_fit_plot/MS_visit_joint_pdf/%s_diff.pdf'%(iapoid))
         close()
+
+def plot_visit_fits_2comp (iapoid, data_spec_arr, data_err_arr, single_spec, model_specs2, 
+                     date_arr, popt_single, popt2, ishow=0):
+    istep=0.3
+    ledges = [[15140, 15810], [15850, 16435], [16470,16955]]
+    dof = [len(array(data_spec_arr).flatten())+ ix for ix in (len(popt_single), len(popt2))]
+    
+    chi1, chi2 = [sum((array(([single_spec, model_specs2][i])-array(data_spec_arr))/array(data_err_arr))**2)/dof[i] for i in range(2)]
+    
+    f, axes=subplots(3,1,figsize=(12,8))
+    for j in range(len(date_arr)):        
+        data_spec, specerr, N1_spec, N2_spec = (data_spec_arr[j], 
+                      data_err_arr[j], single_spec[j], model_specs2[j])
+        
+        for i in range(len(ledges)):
+            m = (wavelength > ledges[i][0]) & (wavelength < ledges[i][1]) 
+            axes[i].fill_between(wavelength[m], j*istep+data_spec[m]-specerr[m], j*istep+data_spec[m]+specerr[m], color='k',alpha=0.1)
+            axes[i].plot(wavelength[m], j*istep+data_spec[m], color='k', lw=0.5, label = '%s'%(date_arr[j]))
+            if j==len(date_arr)-1:
+                axes[i].plot(wavelength[m], j*istep+N1_spec[m], color='b', lw=0.5, label = 'N=1(%.2f)'%(chi1))
+                axes[i].plot(wavelength[m], j*istep+N2_spec[m], color='r', lw=0.5, label = 'N=2(%.2f)'%(chi3))
+            else:
+                axes[i].plot(wavelength[m], j*istep+N1_spec[m], color='b', lw=0.5)
+                axes[i].plot(wavelength[m], j*istep+N2_spec[m], color='r', lw=0.5)
+
+            axes[i].set_xlim(ledges[i])
+            axes[i].set_ylim(0.7, len(date_arr)*istep+1)
+    axes[0].legend(loc = 'best', frameon = 1, fontsize= 6, ncol=len(date_arr)/10+1)
+    axes[1].set_ylabel('Normalized Flux')
+    axes[-1].set_xlabel('Wavelenght A')
+    axes[0].set_title('Visit Spec Fit %s'%(iapoid))
+    if ishow: 
+        show()
+    else:
+        savefig(apodir+'specs_fit_plot/MS_visit_joint/%s_fit.jpg'%(iapoid))
+        #savefig(apodir+'specs_fit_plot/MS_visit_joint_pdf/%s_fit.pdf'%(iapoid))
+        close()
+
+
+    f, axes=subplots(3,1,figsize=(12,8))
+    for j in range(len(date_arr)):
+        data_spec, specerr, N1_spec, N3_spec, N10_spec = (data_spec_arr[j], 
+                      data_err_arr[j], single_spec[j], model_specs3[j], model_specs10[j])
+        for i in range(len(ledges)):
+            m = (wavelength > ledges[i][0]) & (wavelength < ledges[i][1]) 
+            axes[i].fill_between(wavelength[m], j*istep+1-specerr[m], j*istep+1+specerr[m], color='k',alpha=0.2)
+            axes[i].plot(wavelength[m], j*istep+ones(sum(m)), color='k', lw=1, label = '%s'%(date_arr[j]))
+            if j==len(date_arr)-1:  
+                axes[i].plot(wavelength[m], j*istep+N1_spec[m]/data_spec[m], color='b', lw=0.3, label = 'N=1(%.2f)'%(chi1))
+                axes[i].plot(wavelength[m], j*istep+N2_spec[m]/data_spec[m], color='r', lw=0.3, label = 'N=2(%.2f)'%(chi3))
+            else:
+                axes[i].plot(wavelength[m], j*istep+N1_spec[m]/data_spec[m], color='b', lw=0.3)
+                axes[i].plot(wavelength[m], j*istep+N2_spec[m]/data_spec[m], color='r', lw=0.3)
+
+            axes[i].set_xlim(ledges[i])
+            axes[i].set_ylim(0.7, len(date_arr)*istep+1)
+    axes[0].legend(loc = 'best', frameon = 1, fontsize= 6,ncol=len(date_arr)/10+1)
+    axes[1].set_ylabel('Flux_model / Flux_data')
+    axes[-1].set_xlabel('Wavelenght A')
+    axes[0].set_title('Visit Spec Fit Ratio %s'%(iapoid))
+    if ishow: 
+        show()
+    else:
+        savefig(apodir+'specs_fit_plot/MS_visit_joint/%s_diff.jpg'%(iapoid))
+        #savefig(apodir+'specs_fit_plot/MS_visit_joint_pdf/%s_diff.pdf'%(iapoid))
+        close()
+    
+        
         
 def process_visit_fits(iapoid):
     'process all the MS visit spec, takes a loooong time'
@@ -243,6 +316,9 @@ def process_visit_fits(iapoid):
             save(fitparams_dir+'%s/%s_vhelio.npy'%(iapoid,iapoid), vhelio_arr)        
             save(fitparams_dir+'%s/%s_date.npy'%(iapoid,iapoid), date_arr)
             save(fitparams_dir+'%s/%s_N1_params.npy'%(iapoid,iapoid), popt_single)
+            ########## make a plot
+            plot_visit_fits_2comp (iapoid, data_spec_arr, data_err_arr, single_spec, model_specs, 
+                     date_arr, popt_single, popt, ishow=0)
 
 pool=MPIPool()
 if not pool.is_master():
