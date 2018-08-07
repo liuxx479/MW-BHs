@@ -289,17 +289,17 @@ def process_visit_fits(iapoid):
     'process all the MS visit spec, takes a loooong time'
     if iapoid[0]!='2':
         return 0 ## not a valid file
-    if os.path.isfile(fitparams_dir+'%s/%s_N%i_components.npy'%(iapoid,iapoid, list_components[-1])):
-        ######### fit already processed:
-        #data_spec_arr, data_err_arr, single_spec, model_specs3, date_arr, popt_single, popt3, 
-        data_spec_arr, data_err_arr, single_spec, model_specs3 = load(fitspecs_dir+'%s/%s_N3_specs.npy'%(iapoid,iapoid))
-        data_spec_arr, data_err_arr, single_spec, model_specs10 = load(fitspecs_dir+'%s/%s_N10_specs.npy'%(iapoid,iapoid))
-        popt3=load(fitparams_dir+'%s/%s_N%i_params.npy'%(iapoid,iapoid, 3))
-        #popt10=load(fitparams_dir+'%s/%s_N%i_params.npy'%(iapoid,iapoid, 10))
-        popt_single=load(fitparams_dir+'%s/%s_N1_params.npy'%(iapoid,iapoid))
-        date_arr=load(fitparams_dir+'%s/%s_date.npy'%(iapoid,iapoid))
-        #plot_visit_fits (iapoid, data_spec_arr, data_err_arr, single_spec, model_specs3, model_specs10, 
-        #             date_arr, popt_single, popt3, popt10)
+    #if os.path.isfile(fitparams_dir+'%s/%s_N%i_components.npy'%(iapoid,iapoid, list_components[-1])):
+        ########## fit already processed:
+        ##data_spec_arr, data_err_arr, single_spec, model_specs3, date_arr, popt_single, popt3, 
+        #data_spec_arr, data_err_arr, single_spec, model_specs3 = load(fitspecs_dir+'%s/%s_N3_specs.npy'%(iapoid,iapoid))
+        #data_spec_arr, data_err_arr, single_spec, model_specs10 = load(fitspecs_dir+'%s/%s_N10_specs.npy'%(iapoid,iapoid))
+        #popt3=load(fitparams_dir+'%s/%s_N%i_params.npy'%(iapoid,iapoid, 3))
+        ##popt10=load(fitparams_dir+'%s/%s_N%i_params.npy'%(iapoid,iapoid, 10))
+        #popt_single=load(fitparams_dir+'%s/%s_N1_params.npy'%(iapoid,iapoid))
+        #date_arr=load(fitparams_dir+'%s/%s_date.npy'%(iapoid,iapoid))
+        ##plot_visit_fits (iapoid, data_spec_arr, data_err_arr, single_spec, model_specs3, model_specs10, 
+        ##             date_arr, popt_single, popt3, popt10)
     out_arr = []
     os.system('mkdir -pv %s%s'%(fitparams_dir,iapoid))
     os.system('mkdir -pv %s%s'%(fitspecs_dir,iapoid))
