@@ -253,8 +253,8 @@ def plot_visit_fits_2comp (iapoid, data_spec_arr, data_err_arr, single_spec, mod
 
     f, axes=subplots(3,1,figsize=(12,8))
     for j in range(len(date_arr)):
-        data_spec, specerr, N1_spec, N3_spec, N10_spec = (data_spec_arr[j], 
-                      data_err_arr[j], single_spec[j], model_specs3[j], model_specs10[j])
+        data_spec, specerr, N1_spec, N2_spec = (data_spec_arr[j], 
+                      data_err_arr[j], single_spec[j], model_specs2[j])
         for i in range(len(ledges)):
             m = (wavelength > ledges[i][0]) & (wavelength < ledges[i][1]) 
             axes[i].fill_between(wavelength[m], j*istep+1-specerr[m], j*istep+1+specerr[m], color='k',alpha=0.2)
