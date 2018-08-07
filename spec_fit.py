@@ -214,7 +214,7 @@ def plot_visit_fits (iapoid, data_spec_arr, data_err_arr, single_spec, model_spe
 
 def plot_visit_fits_2comp (iapoid, data_spec_arr, data_err_arr, single_spec, model_specs2, 
                      date_arr, popt_single, popt2, ishow=0):
-    fnpath=apodir+'specs_fit_plot/MS_visit_joint/'
+    fnpath='/scratch/02977/jialiu/ApogeeLine/specs_fit_plot/Giants_MS/'
     istep=0.3
     ledges = [[15140, 15810], [15850, 16435], [16470,16955]]
     dof = [len(array(data_spec_arr).flatten())+ ix for ix in (len(popt_single), len(popt2))]
@@ -246,8 +246,8 @@ def plot_visit_fits_2comp (iapoid, data_spec_arr, data_err_arr, single_spec, mod
     if ishow: 
         show()
     else:
-        fnfig2='%s_fit.jpg'%(iapoid)
-        savefig(fnpath+fnfig2)
+        fnfig1='%s_fit.jpg'%(iapoid)
+        savefig(fnpath+fnfig1)
         close()
 
 
@@ -276,13 +276,13 @@ def plot_visit_fits_2comp (iapoid, data_spec_arr, data_err_arr, single_spec, mod
         show()
     else:
         
-        fnfig2=fnpath+'%s_diff.jpg'%(iapoid)
-        savefig()
+        fnfig2='%s_diff.jpg'%(iapoid)
+        savefig(fnpath+fnfig2)
         close()
 
     print 'uploading to dropbox'
-    os.system('/work/02977/jialiu/Dropbox-Uploader/dropbox_uploader.sh upload %s %s'%(fnpath,fnfig1))
-    os.system('/work/02977/jialiu/Dropbox-Uploader/dropbox_uploader.sh upload %s %s'%(fnpath,fnfig2))
+    os.system('/work/02977/jialiu/Dropbox-Uploader/dropbox_uploader.sh upload %s %s'%(fnpath+fnfig1,fnfig1))
+    os.system('/work/02977/jialiu/Dropbox-Uploader/dropbox_uploader.sh upload %s %s'%(fnpath+fnfig2,fnfig2))
         
         
 def process_visit_fits(iapoid):
