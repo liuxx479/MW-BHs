@@ -33,8 +33,10 @@ if batch == 'lachlan':
     apoid_candidates = load(apodir+'overly_bright_ids_filt.npy').T[0][::-1]
     batchname = 'dwarfs_lachlan_kareemNN'
 elif batch == 'test':
+    seed(10)
     all_giants = load(apodir+'APOGEE_ID_giants_goodpara.npy')
-    apoid_candidates = all_giants[2000:2100]
+    #apoid_candidates = all_giants[2000:2100]
+    apoid_candidates = all_giants[choice(len(all_giants), 1000, replace=0)]
     batchname = 'giants_'+batch
     
 else: ## batch = 0,1,2,3,..9, chop up the data into 10 chunks for analysis
@@ -220,6 +222,10 @@ def plot_visit_fits_2comp (iapoid, data_spec_arr, data_err_arr, single_spec, mod
     dof = [len(array(data_spec_arr).flatten())+ ix for ix in (len(popt_single), len(popt2))]
     
     chi1, chi2 = [sum((array(([single_spec, model_specs2][i])-array(data_spec_arr))/array(data_err_arr))**2)/dof[i] for i in range(2)]
+    # record Teff vs chi2
+    Teff1, logg1, feh, alphafe, vmacro1, dv1 = popt_single[:6]
+    os.system('echo %s\t%s\t%s\t%s >> /scratch/02977/jialiu/ApogeeLine/testNN.txt'%(iapoid, 
+                                                    Teff1, logg1, chi1))
     
     f, axes=subplots(3,1,figsize=(12,8))
     for j in range(len(date_arr)):        
