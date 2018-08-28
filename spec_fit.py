@@ -38,7 +38,11 @@ elif batch == 'test':
     #apoid_candidates = all_giants[2000:2100]
     apoid_candidates = all_giants[choice(len(all_giants), 1000, replace=0)]
     batchname = 'giants_'+batch
-    
+elif batch == 'badpara':
+    all_giants = load(apodir+'APOGEE_ID_giants_badpara.npy')
+    #apoid_candidates = all_giants[2000:2100]
+    apoid_candidates = all_giants[choice(len(all_giants), 1000, replace=0)]
+    batchname = 'giants_'+batch
 else: ## batch = 0,1,2,3,..9, chop up the data into 10 chunks for analysis
     all_giants = load(apodir+'APOGEE_ID_giants_goodpara.npy')
     Nchunk = len(all_giants)/10+1
@@ -318,6 +322,12 @@ def process_visit_fits(iapoid):
         out_arr.append(out)
         ### save to files
         data_spec_arr, data_err_arr, single_spec, model_specs, vhelio_arr, date_arr, popt_single, popt, pcov, q2arr = out
+        
+        ############# 8.28, add chi^2 array
+        dof = [len(array(data_spec_arr).flatten())+ ix for ix in (len(popt_single), len(popt))]
+        chi1, chi2 = [sum((array(([single_spec, model_specs][i])-array(data_spec_arr))/array(data_err_arr))**2)/dof[i] for i in range(2)]
+        Teff1, logg1, feh, alphafe, vmacro1, dv1 = popt_single[:6]
+        
         save(fitspecs_dir+'%s/%s_N%i_specs.npy'%(iapoid,iapoid, iN), 
              [data_spec_arr, data_err_arr, single_spec, model_specs])
         save(fitparams_dir+'%s/%s_N%i_params.npy'%(iapoid,iapoid, iN), popt)
@@ -327,8 +337,11 @@ def process_visit_fits(iapoid):
             save(fitparams_dir+'%s/%s_vhelio.npy'%(iapoid,iapoid), vhelio_arr)        
             save(fitparams_dir+'%s/%s_date.npy'%(iapoid,iapoid), date_arr)
             save(fitparams_dir+'%s/%s_N1_params.npy'%(iapoid,iapoid), popt_single)
-            ########## make a plot
-            if batch == 'test':
+            os.system('echo %s\t%s\t%s\t%s >> /scratch/02977/jialiu/ApogeeLine/chi2.txt'%(iapoid, 
+                                                    Teff1, logg1, chi1))
+            ########## make a plot for likely binary stars
+            #if batch == 'test':
+            if chi2/chi1<0.7:
                 plot_visit_fits_2comp (iapoid, data_spec_arr, data_err_arr, single_spec, model_specs, 
                      date_arr, popt_single, popt, ishow=0)
 
