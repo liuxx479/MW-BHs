@@ -327,7 +327,6 @@ def process_visit_fits(iapoid):
         dof = [len(array(data_spec_arr).flatten())+ ix for ix in (len(popt_single), len(popt))]
         chi1, chi2 = [sum((array(([single_spec, model_specs][i])-array(data_spec_arr))/array(data_err_arr))**2)/dof[i] for i in range(2)]
         Teff1, logg1, feh, alphafe, vmacro1, dv1 = popt_single[:6]
-        
         save(fitspecs_dir+'%s/%s_N%i_specs.npy'%(iapoid,iapoid, iN), 
              [data_spec_arr, data_err_arr, single_spec, model_specs])
         save(fitparams_dir+'%s/%s_N%i_params.npy'%(iapoid,iapoid, iN), popt)
@@ -337,8 +336,8 @@ def process_visit_fits(iapoid):
             save(fitparams_dir+'%s/%s_vhelio.npy'%(iapoid,iapoid), vhelio_arr)        
             save(fitparams_dir+'%s/%s_date.npy'%(iapoid,iapoid), date_arr)
             save(fitparams_dir+'%s/%s_N1_params.npy'%(iapoid,iapoid), popt_single)
-            os.system('echo %s\t%s\t%s\t%s >> /scratch/02977/jialiu/ApogeeLine/chi2.txt'%(iapoid, 
-                                                    Teff1, logg1, chi1))
+            os.system('echo %s\t%s\t%s\t%s\t%s >> /scratch/02977/jialiu/ApogeeLine/chi2.txt'%(iapoid, 
+                                                    Teff1, logg1, chi1, chi2))
             ########## make a plot for likely binary stars
             #if batch == 'test':
             if chi2/chi1<0.7:
