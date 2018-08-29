@@ -50,12 +50,6 @@ print batch
     #batchname = 'giants_'+batch
 
 
-fitparams_dir = apodir+'specs_fit_params/%s/'%(batchname)
-fitspecs_dir = apodir+'specs_fit_specs/%s/'%(batchname)
-
-os.system('mkdir -pv '+fitparams_dir)
-os.system('mkdir -pv '+fitspecs_dir)
-
 
 #hdulist_visit = fits.open(apodir+'allVisit-l31c.2.fits')
 #out = [hdulist_visit[1].data[x] for x in ['APOGEE_ID','PLATE','MJD','FILE']]
@@ -67,6 +61,14 @@ Nchunk = len(apoid_unique)/10+1
 apoid_candidates = apoid_unique[Nchunk*int(batch):Nchunk*(int(batch)+1)]
 batchname = 'batch_'+batch
 print batchname, 'total candidates: %s'%(len(apoid_candidates))
+
+
+fitparams_dir = apodir+'specs_fit_params/%s/'%(batchname)
+fitspecs_dir = apodir+'specs_fit_specs/%s/'%(batchname)
+
+os.system('mkdir -pv '+fitparams_dir)
+os.system('mkdir -pv '+fitspecs_dir)
+
 
 def specfn(params):
     iplate,imjd,ifn = params
