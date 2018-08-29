@@ -332,11 +332,11 @@ def process_visit_fits(iapoid):
         out_arr.append(out)
         ### save to files
         data_spec_arr, data_err_arr, single_spec, model_specs, vhelio_arr, date_arr, popt_single, popt, pcov, q2arr = out
-        fimp = sum((abs(single_spec-data_spec_arr) - abs(model_specs-data_err_arr))/data_err_arr)
+        fimp = sum((abs(single_spec-data_spec_arr) - abs(model_specs-data_spec_arr))/data_err_arr)
         fimp /= sum(abs(single_spec-model_specs)/data_err_arr)
         
         ############# 8.28, add chi^2 array
-        dof = [len(array(data_spec_arr).flatten())+ ix for ix in (len(popt_single), len(popt))]
+        dof = [len(array(data_spec_arr).flatten())-ix for ix in (len(popt_single), len(popt))]
         chi1, chi2 = [sum((array(([single_spec, model_specs][i])-array(data_spec_arr))/array(data_err_arr))**2)/dof[i] for i in range(2)]
         Teff1, logg1, feh, alphafe, vmacro1, dv1 = popt_single[:6]
         save(fitspecs_dir+'%s/%s_N%i_specs.npy'%(iapoid,iapoid, iN), 
