@@ -96,7 +96,10 @@ def read_spec(fitsfile, get_vhelio=0):
     ilambda = ihdulist[4].data
     iidx=ilambda.flatten()
     if get_vhelio:
-        vhelio = ihdulist[0].header['VHELIO']
+        try:
+            vhelio = ihdulist[0].header['VHELIO']
+        except Exception:
+            vhelio = 0.0
         return ilambda, ispec, ierr, ipass, idate, vhelio
     else:
         return ilambda, ispec, ierr, ipass, idate
@@ -150,7 +153,7 @@ def fit_visits (iapoid, N=3):
         NN_coeffs_Teff2_logg2 = NN_coeffs_Teff2_logg2)
         q2arr[n+1] = [q, Teff2, logg2, vmacro2]#
         
-    return data_spec_arr, data_err_arr, single_spec, model_specs, vhelio_arr, date_arr, popt_single, popt, pcov, q2arr
+    return array(data_spec_arr), array(data_err_arr), array(single_spec), array(model_specs), vhelio_arr, date_arr, popt_single, popt, pcov, q2arr
 
 def plot_visit_fits (iapoid, data_spec_arr, data_err_arr, single_spec, model_specs3, model_specs10, 
                      date_arr, popt_single, popt3, popt10, ishow=0):
