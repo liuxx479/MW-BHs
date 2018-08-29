@@ -304,7 +304,30 @@ def plot_visit_fits_2comp (iapoid, data_spec_arr, data_err_arr, single_spec, mod
     os.system('/work/02977/jialiu/Dropbox-Uploader/dropbox_uploader.sh upload %s %s'%(fnpath+fnfig1,fnfig1))
     os.system('/work/02977/jialiu/Dropbox-Uploader/dropbox_uploader.sh upload %s %s'%(fnpath+fnfig2,fnfig2))
         
-        
+def maybebinary(chi1,chi2,fimp):
+    dchi = chi1-chi2
+    if dchi<=300:
+        return 0
+    elif dchi>3000:
+        return 1
+    elif dchi>2500:
+        return int(fimp>0.05)
+    elif dchi>2000:
+        return int(fimp>0.075)
+    elif dchi>1500:
+        return int(fimp>0.1)
+    elif dchi>1000:
+        return int(fimp>0.125)    
+    elif dchi>750:
+        return int(fimp>0.15)
+    elif dchi>600:
+        return int(fimp>0.175)
+    elif dchi>450:
+        return int(fimp>0.2)
+    elif dchi>300:
+        return int(fimp>0.225)
+    return 0
+
 def process_visit_fits(iapoid):
     'process all the MS visit spec, takes a loooong time'
     if iapoid[0]!='2':
@@ -352,9 +375,9 @@ def process_visit_fits(iapoid):
             os.system('echo %s\t%s\t%s\t%s\t%s\t%s >> /scratch/02977/jialiu/ApogeeLine/chi2_all.txt'%(iapoid, Teff1, logg1, chi1, chi2, fimp))
             ########## make a plot for likely binary stars
             #if batch == 'test':
-            #if chi2/chi1<0.7:
-                #plot_visit_fits_2comp (iapoid, data_spec_arr, data_err_arr, single_spec, model_specs, 
-                     #date_arr, popt_single, popt, ishow=0)
+            if maybebinary(chi1,chi2,fimp):
+                plot_visit_fits_2comp (iapoid, data_spec_arr, data_err_arr, single_spec, model_specs, 
+                     date_arr, popt_single, popt, ishow=0)
 
 pool=MPIPool()
 if not pool.is_master():
