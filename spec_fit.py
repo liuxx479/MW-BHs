@@ -29,25 +29,26 @@ import fitting
 batch = str(sys.argv[1])
 print batch
 
-if batch == 'lachlan':
-    apoid_candidates = load(apodir+'overly_bright_ids_filt.npy').T[0][::-1]
-    batchname = 'dwarfs_lachlan_kareemNN'
-elif batch == 'test':
-    seed(10)
-    all_giants = load(apodir+'APOGEE_ID_giants_goodpara.npy')
-    #apoid_candidates = all_giants[2000:2100]
-    apoid_candidates = all_giants[choice(len(all_giants), 1000, replace=0)]
-    batchname = 'giants_'+batch
-elif batch == 'badpara':
-    all_giants = load(apodir+'APOGEE_ID_giants_badpara.npy')
-    #apoid_candidates = all_giants[2000:2100]
-    apoid_candidates = all_giants[choice(len(all_giants), 1000, replace=0)]
-    batchname = 'giants_'+batch
-else: ## batch = 0,1,2,3,..9, chop up the data into 10 chunks for analysis
-    all_giants = load(apodir+'APOGEE_ID_giants_goodpara.npy')
-    Nchunk = len(all_giants)/10+1
-    apoid_candidates = all_giants[Nchunk*int(batch):Nchunk*(int(batch)+1)]
-    batchname = 'giants_'+batch
+#if batch == 'lachlan':
+    #apoid_candidates = load(apodir+'overly_bright_ids_filt.npy').T[0][::-1]
+    #batchname = 'dwarfs_lachlan_kareemNN'
+#elif batch == 'test':
+    #seed(10)
+    #all_giants = load(apodir+'APOGEE_ID_giants_goodpara.npy')
+    ##apoid_candidates = all_giants[2000:2100]
+    #apoid_candidates = all_giants[choice(len(all_giants), 1000, replace=0)]
+    #batchname = 'giants_'+batch
+#elif batch == 'badpara':
+    #all_giants = load(apodir+'APOGEE_ID_giants_badpara.npy')
+    ##apoid_candidates = all_giants[2000:2100]
+    #apoid_candidates = all_giants#[choice(len(all_giants), 1000, replace=0)]
+    #batchname = 'giants_'+batch
+#else: ## batch = 0,1,2,3,..9, chop up the data into 10 chunks for analysis
+    #all_giants = load(apodir+'APOGEE_ID_giants_goodpara.npy')
+    #Nchunk = len(all_giants)/10+1
+    #apoid_candidates = all_giants[Nchunk*int(batch):Nchunk*(int(batch)+1)]
+    #batchname = 'giants_'+batch
+
 
 fitparams_dir = apodir+'specs_fit_params/%s/'%(batchname)
 fitspecs_dir = apodir+'specs_fit_specs/%s/'%(batchname)
@@ -56,12 +57,16 @@ os.system('mkdir -pv '+fitparams_dir)
 os.system('mkdir -pv '+fitspecs_dir)
 
 
-print batchname, 'total candidates: %s'%(len(apoid_candidates))
-
 #hdulist_visit = fits.open(apodir+'allVisit-l31c.2.fits')
 #out = [hdulist_visit[1].data[x] for x in ['APOGEE_ID','PLATE','MJD','FILE']]
 #save('ID_PLATE_MJD_FILE.npy',array(out).T)
 APOGEE_ID, PLATE, MJD, FILE = load(apodir+'ID_PLATE_MJD_FILE.npy').T
+
+apoid_unique = unique(APOGEE_ID)
+Nchunk = len(apoid_unique)/10+1
+apoid_candidates = apoid_unique[Nchunk*int(batch):Nchunk*(int(batch)+1)]
+batchname = 'batch_'+batch
+print batchname, 'total candidates: %s'%(len(apoid_candidates))
 
 def specfn(params):
     iplate,imjd,ifn = params
@@ -151,7 +156,7 @@ def plot_visit_fits (iapoid, data_spec_arr, data_err_arr, single_spec, model_spe
     #data_spec_arr, data_err_arr, single_spec, model_specs10, vhelio_arr, date_arr, popt_single, popt10, pcov, q2arr = out10
     istep=0.3
     ledges = [[15140, 15810], [15850, 16435], [16470,16955]]
-    dof = [len(array(data_spec_arr).flatten())+ ix for ix in (len(popt_single), len(popt3), len(popt10))]
+    dof = [len(array(data_spec_arr).flatten())- ix for ix in (len(popt_single), len(popt3), len(popt10))]
     
     chi1, chi3, chi10 = [sum((array(([single_spec, model_specs3, model_specs10][i])-array(data_spec_arr))/array(data_err_arr))**2)/dof[i] for i in range(3)]
     #print chi1, chi3, chi10
@@ -223,7 +228,7 @@ def plot_visit_fits_2comp (iapoid, data_spec_arr, data_err_arr, single_spec, mod
     fnpath='/scratch/02977/jialiu/ApogeeLine/specs_fit_plot/Giants_MS/'
     istep=0.3
     ledges = [[15140, 15810], [15850, 16435], [16470,16955]]
-    dof = [len(array(data_spec_arr).flatten())+ ix for ix in (len(popt_single), len(popt2))]
+    dof = [len(array(data_spec_arr).flatten())- ix for ix in (len(popt_single), len(popt2))]
     
     chi1, chi2 = [sum((array(([single_spec, model_specs2][i])-array(data_spec_arr))/array(data_err_arr))**2)/dof[i] for i in range(2)]
     # record Teff vs chi2
@@ -316,12 +321,14 @@ def process_visit_fits(iapoid):
     for iN in list_components:
         print iapoid, iN
         fn_components=fitparams_dir+'%s/%s_N%i_components.npy'%(iapoid,iapoid, iN)
-        if os.path.isfile(fn_components):
-            continue
+        #if os.path.isfile(fn_components):
+            #continue
         out = fit_visits(iapoid, N=iN)
         out_arr.append(out)
         ### save to files
         data_spec_arr, data_err_arr, single_spec, model_specs, vhelio_arr, date_arr, popt_single, popt, pcov, q2arr = out
+        fimp = sum((abs(single_spec-data_spec_arr) - abs(model_specs-data_err_arr))/data_err_arr)
+        fimp /= sum(abs(single_spec-model_specs)/data_err_arr)
         
         ############# 8.28, add chi^2 array
         dof = [len(array(data_spec_arr).flatten())+ ix for ix in (len(popt_single), len(popt))]
@@ -336,13 +343,13 @@ def process_visit_fits(iapoid):
             save(fitparams_dir+'%s/%s_vhelio.npy'%(iapoid,iapoid), vhelio_arr)        
             save(fitparams_dir+'%s/%s_date.npy'%(iapoid,iapoid), date_arr)
             save(fitparams_dir+'%s/%s_N1_params.npy'%(iapoid,iapoid), popt_single)
-            os.system('echo %s\t%s\t%s\t%s\t%s >> /scratch/02977/jialiu/ApogeeLine/chi2.txt'%(iapoid, 
-                                                    Teff1, logg1, chi1, chi2))
+            os.system('echo %s\t%s\t%s\t%s\t%s >> /scratch/02977/jialiu/ApogeeLine/chi2_all.txt'%(iapoid, 
+                                                    Teff1, logg1, chi1, chi2, fimp))
             ########## make a plot for likely binary stars
             #if batch == 'test':
-            if chi2/chi1<0.7:
-                plot_visit_fits_2comp (iapoid, data_spec_arr, data_err_arr, single_spec, model_specs, 
-                     date_arr, popt_single, popt, ishow=0)
+            #if chi2/chi1<0.7:
+                #plot_visit_fits_2comp (iapoid, data_spec_arr, data_err_arr, single_spec, model_specs, 
+                     #date_arr, popt_single, popt, ishow=0)
 
 pool=MPIPool()
 if not pool.is_master():
