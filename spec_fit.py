@@ -27,7 +27,7 @@ import fitting
 
 ############ new addition after Yuansen created new NN for giants
 batch = str(sys.argv[1])
-print batch
+#print batch
 
 #if batch == 'lachlan':
     #apoid_candidates = load(apodir+'overly_bright_ids_filt.npy').T[0][::-1]
@@ -60,7 +60,6 @@ apoid_unique = unique(APOGEE_ID)
 Nchunk = len(apoid_unique)/10+1
 apoid_candidates = apoid_unique[Nchunk*int(batch):Nchunk*(int(batch)+1)]
 batchname = 'batch_'+batch
-print batchname, 'total candidates: %s'%(len(apoid_candidates))
 
 
 fitparams_dir = apodir+'specs_fit_params/%s/'%(batchname)
@@ -347,7 +346,7 @@ def process_visit_fits(iapoid):
     os.system('mkdir -pv %s%s'%(fitparams_dir,iapoid))
     os.system('mkdir -pv %s%s'%(fitspecs_dir,iapoid))
     for iN in list_components:
-        print iapoid, iN
+        #print iapoid, iN
         fn_components=fitparams_dir+'%s/%s_N%i_components.npy'%(iapoid,iapoid, iN)
         #if os.path.isfile(fn_components):
             #continue
@@ -384,6 +383,7 @@ if not pool.is_master():
     pool.wait()
     sys.exit(0)
 
+print batchname, 'total candidates: %s'%(len(apoid_candidates))
 pool.map(process_visit_fits, apoid_candidates)
 pool.close()
 
