@@ -348,8 +348,8 @@ def process_visit_fits(iapoid):
     for iN in list_components:
         #print iapoid, iN
         fn_components=fitparams_dir+'%s/%s_N%i_components.npy'%(iapoid,iapoid, iN)
-        #if os.path.isfile(fn_components):
-            #continue
+        if os.path.isfile(fn_components):
+            continue
         out = fit_visits(iapoid, N=iN)
         out_arr.append(out)
         ### save to files
