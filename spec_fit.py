@@ -392,7 +392,7 @@ def process_visit_fits(iapoid):
             save(fitparams_dir+'%s/%s_date.npy'%(iapoid,iapoid), date_arr)
             save(fitparams_dir+'%s/%s_N1_params.npy'%(iapoid,iapoid), popt_single)
             print '%s\t%s\t%s\t%s\t%s\t%s'%(iapoid, Teff1, logg1, chi1, chi2, fimp)
-            if batch[:6]='kareem':
+            if batch[:6]=='kareem':
                 os.system('echo %s\t%s\t%s\t%s\t%s\t%s >> /scratch/02977/jialiu/ApogeeLine/chi2_%s.txt'%(iapoid, Teff1, logg1, chi1, chi2, fimp, batch))
             else:
                 os.system('echo %s\t%s\t%s\t%s\t%s\t%s >> /scratch/02977/jialiu/ApogeeLine/chi2_all.txt'%(iapoid, Teff1, logg1, chi1, chi2, fimp))
