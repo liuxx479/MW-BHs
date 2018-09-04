@@ -55,6 +55,7 @@ batch = str(sys.argv[1])
 #out = [hdulist_visit[1].data[x] for x in ['APOGEE_ID','PLATE','MJD','FILE']]
 #save('ID_PLATE_MJD_FILE.npy',array(out).T)
 
+APOGEE_ID, PLATE, MJD, FILE = load(apodir+'ID_PLATE_MJD_FILE.npy').T
 
 if batch == 'kareem':
     apoid_candidates = loadtxt(apodir+'Table_E3_all_binary_star_labels.csv',
@@ -79,7 +80,6 @@ elif batch == 'kareem_YSradius':
         #os.system('ln -sf /home1/02977/jialiu/ApogeeLine/binspec/neural_nets_kareem_YSTradius /home1/02977/jialiu/ApogeeLine/binspec/neural_nets')
     batchname=batch
  
-APOGEE_ID, PLATE, MJD, FILE = load(apodir+'ID_PLATE_MJD_FILE.npy').T
 else:
     apoid_unique = unique(APOGEE_ID)
     Nchunk = len(apoid_unique)/10+1
