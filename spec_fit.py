@@ -78,9 +78,9 @@ elif batch == 'kareem_YSradius':
         #os.system('ln -sf /home1/02977/jialiu/ApogeeLine/binspec/spectral_model_Kareem.py /home1/02977/jialiu/ApogeeLine/binspec/spectral_model.py')
         #os.system('ln -sf /home1/02977/jialiu/ApogeeLine/binspec/neural_nets_kareem_YSTradius /home1/02977/jialiu/ApogeeLine/binspec/neural_nets')
     batchname=batch
-    
+ 
+APOGEE_ID, PLATE, MJD, FILE = load(apodir+'ID_PLATE_MJD_FILE.npy').T
 else:
-    APOGEE_ID, PLATE, MJD, FILE = load(apodir+'ID_PLATE_MJD_FILE.npy').T
     apoid_unique = unique(APOGEE_ID)
     Nchunk = len(apoid_unique)/10+1
     apoid_candidates = apoid_unique[Nchunk*int(batch):Nchunk*(int(batch)+1)]
