@@ -54,12 +54,33 @@ batch = str(sys.argv[1])
 #hdulist_visit = fits.open(apodir+'allVisit-l31c.2.fits')
 #out = [hdulist_visit[1].data[x] for x in ['APOGEE_ID','PLATE','MJD','FILE']]
 #save('ID_PLATE_MJD_FILE.npy',array(out).T)
-APOGEE_ID, PLATE, MJD, FILE = load(apodir+'ID_PLATE_MJD_FILE.npy').T
+if batch == 'kareem':
+    IDbinary_kareem = loadtxt(apodir+'Table_E3_all_binary_star_labels.csv',
+                          dtype='|S25',usecols=[0,],delimiter=',')
+    
+    os.system('rm /home1/02977/jialiu/ApogeeLine/binspec/spectral_model.py')
+    os.system('rm /home1/02977/jialiu/ApogeeLine/binspec/neural_nets')
+    os.system('ln -sf /home1/02977/jialiu/ApogeeLine/binspec/spectral_model_Kareem.py /home1/02977/jialiu/ApogeeLine/binspec/spectral_model.py')
+    os.system('ln -sf /home1/02977/jialiu/ApogeeLine/binspec/neural_nets_kareem /home1/02977/jialiu/ApogeeLine/binspec/neural_nets')
+    
+    batchname=batch
 
-apoid_unique = unique(APOGEE_ID)
-Nchunk = len(apoid_unique)/10+1
-apoid_candidates = apoid_unique[Nchunk*int(batch):Nchunk*(int(batch)+1)]
-batchname = 'batch_'+batch
+elif batch == 'kareem_YSradius':
+    IDbinary_kareem = loadtxt(apodir+'Table_E3_all_binary_star_labels.csv',
+                          dtype='|S25',usecols=[0,],delimiter=',')
+    
+    os.system('rm /home1/02977/jialiu/ApogeeLine/binspec/spectral_model.py')
+    os.system('rm /home1/02977/jialiu/ApogeeLine/binspec/neural_nets')
+    os.system('ln -sf /home1/02977/jialiu/ApogeeLine/binspec/spectral_model_Kareem.py /home1/02977/jialiu/ApogeeLine/binspec/spectral_model.py')
+    os.system('ln -sf /home1/02977/jialiu/ApogeeLine/binspec/neural_nets_kareem_YSTradius /home1/02977/jialiu/ApogeeLine/binspec/neural_nets')
+    batchname=batch
+    
+else:
+    APOGEE_ID, PLATE, MJD, FILE = load(apodir+'ID_PLATE_MJD_FILE.npy').T
+    apoid_unique = unique(APOGEE_ID)
+    Nchunk = len(apoid_unique)/10+1
+    apoid_candidates = apoid_unique[Nchunk*int(batch):Nchunk*(int(batch)+1)]
+    batchname = 'batch_'+batch
 
 
 fitparams_dir = apodir+'specs_fit_params/%s/'%(batchname)
@@ -371,12 +392,15 @@ def process_visit_fits(iapoid):
             save(fitparams_dir+'%s/%s_date.npy'%(iapoid,iapoid), date_arr)
             save(fitparams_dir+'%s/%s_N1_params.npy'%(iapoid,iapoid), popt_single)
             print '%s\t%s\t%s\t%s\t%s\t%s'%(iapoid, Teff1, logg1, chi1, chi2, fimp)
-            os.system('echo %s\t%s\t%s\t%s\t%s\t%s >> /scratch/02977/jialiu/ApogeeLine/chi2_all.txt'%(iapoid, Teff1, logg1, chi1, chi2, fimp))
+            if batch[:6]='kareem':
+                os.system('echo %s\t%s\t%s\t%s\t%s\t%s >> /scratch/02977/jialiu/ApogeeLine/chi2_%s.txt'%(iapoid, Teff1, logg1, chi1, chi2, fimp, batch))
+            else:
+                os.system('echo %s\t%s\t%s\t%s\t%s\t%s >> /scratch/02977/jialiu/ApogeeLine/chi2_all.txt'%(iapoid, Teff1, logg1, chi1, chi2, fimp))
             ########## make a plot for likely binary stars
             #if batch == 'test':
-            if maybebinary(chi1,chi2,fimp):
-                plot_visit_fits_2comp (iapoid, data_spec_arr, data_err_arr, single_spec, model_specs, 
-                     date_arr, popt_single, popt, ishow=0)
+            #if maybebinary(chi1,chi2,fimp):
+                #plot_visit_fits_2comp (iapoid, data_spec_arr, data_err_arr, single_spec, model_specs, 
+                     #date_arr, popt_single, popt, ishow=0)
 
 pool=MPIPool()
 if not pool.is_master():
@@ -387,4 +411,10 @@ print batchname, 'total candidates: %s'%(len(apoid_candidates))
 pool.map(process_visit_fits, apoid_candidates)
 pool.close()
 
+if batch == 'kareem' or batch == 'kareem_YSradius':
+    os.system('rm /home1/02977/jialiu/ApogeeLine/binspec/spectral_model.py')
+    os.system('rm /home1/02977/jialiu/ApogeeLine/binspec/neural_nets')
+    os.system('ln -sf /home1/02977/jialiu/ApogeeLine/binspec/spectral_model_YST.py /home1/02977/jialiu/ApogeeLine/binspec/spectral_model.py')
+    os.system('ln -sf /home1/02977/jialiu/ApogeeLine/binspec/neural_nets_YST /home1/02977/jialiu/ApogeeLine/binspec/neural_nets')
+    
 print 'done-done-done'
