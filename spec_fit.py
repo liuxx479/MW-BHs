@@ -57,9 +57,9 @@ batch = str(sys.argv[1])
 
 
 if batch == 'kareem':
-    IDbinary_kareem = loadtxt(apodir+'Table_E3_all_binary_star_labels.csv',
+    apoid_candidates = loadtxt(apodir+'Table_E3_all_binary_star_labels.csv',
                           dtype='|S25',usecols=[0,],delimiter=',')
-
+    
     #if pool.is_master():
         #os.system('rm /home1/02977/jialiu/ApogeeLine/binspec/spectral_model.py')
         #os.system('rm /home1/02977/jialiu/ApogeeLine/binspec/neural_nets')
@@ -69,7 +69,7 @@ if batch == 'kareem':
     batchname=batch
 
 elif batch == 'kareem_YSradius':
-    IDbinary_kareem = loadtxt(apodir+'Table_E3_all_binary_star_labels.csv',
+    apoid_candidates = loadtxt(apodir+'Table_E3_all_binary_star_labels.csv',
                           dtype='|S25',usecols=[0,],delimiter=',')
     
     #if pool.is_master():
