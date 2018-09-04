@@ -54,17 +54,17 @@ batch = str(sys.argv[1])
 #hdulist_visit = fits.open(apodir+'allVisit-l31c.2.fits')
 #out = [hdulist_visit[1].data[x] for x in ['APOGEE_ID','PLATE','MJD','FILE']]
 #save('ID_PLATE_MJD_FILE.npy',array(out).T)
-pool=MPIPool()
+
 
 if batch == 'kareem':
     IDbinary_kareem = loadtxt(apodir+'Table_E3_all_binary_star_labels.csv',
                           dtype='|S25',usecols=[0,],delimiter=',')
 
-    if pool.is_master():
-        os.system('rm /home1/02977/jialiu/ApogeeLine/binspec/spectral_model.py')
-        os.system('rm /home1/02977/jialiu/ApogeeLine/binspec/neural_nets')
-        os.system('ln -sf /home1/02977/jialiu/ApogeeLine/binspec/spectral_model_Kareem.py /home1/02977/jialiu/ApogeeLine/binspec/spectral_model.py')
-        os.system('ln -sf /home1/02977/jialiu/ApogeeLine/binspec/neural_nets_kareem /home1/02977/jialiu/ApogeeLine/binspec/neural_nets')
+    #if pool.is_master():
+        #os.system('rm /home1/02977/jialiu/ApogeeLine/binspec/spectral_model.py')
+        #os.system('rm /home1/02977/jialiu/ApogeeLine/binspec/neural_nets')
+        #os.system('ln -sf /home1/02977/jialiu/ApogeeLine/binspec/spectral_model_Kareem.py /home1/02977/jialiu/ApogeeLine/binspec/spectral_model.py')
+        #os.system('ln -sf /home1/02977/jialiu/ApogeeLine/binspec/neural_nets_kareem /home1/02977/jialiu/ApogeeLine/binspec/neural_nets')
     
     batchname=batch
 
@@ -72,11 +72,11 @@ elif batch == 'kareem_YSradius':
     IDbinary_kareem = loadtxt(apodir+'Table_E3_all_binary_star_labels.csv',
                           dtype='|S25',usecols=[0,],delimiter=',')
     
-    if pool.is_master():
-        os.system('rm /home1/02977/jialiu/ApogeeLine/binspec/spectral_model.py')
-        os.system('rm /home1/02977/jialiu/ApogeeLine/binspec/neural_nets')
-        os.system('ln -sf /home1/02977/jialiu/ApogeeLine/binspec/spectral_model_Kareem.py /home1/02977/jialiu/ApogeeLine/binspec/spectral_model.py')
-        os.system('ln -sf /home1/02977/jialiu/ApogeeLine/binspec/neural_nets_kareem_YSTradius /home1/02977/jialiu/ApogeeLine/binspec/neural_nets')
+    #if pool.is_master():
+        #os.system('rm /home1/02977/jialiu/ApogeeLine/binspec/spectral_model.py')
+        #os.system('rm /home1/02977/jialiu/ApogeeLine/binspec/neural_nets')
+        #os.system('ln -sf /home1/02977/jialiu/ApogeeLine/binspec/spectral_model_Kareem.py /home1/02977/jialiu/ApogeeLine/binspec/spectral_model.py')
+        #os.system('ln -sf /home1/02977/jialiu/ApogeeLine/binspec/neural_nets_kareem_YSTradius /home1/02977/jialiu/ApogeeLine/binspec/neural_nets')
     batchname=batch
     
 else:
@@ -407,6 +407,7 @@ def process_visit_fits(iapoid):
                      #date_arr, popt_single, popt, ishow=0)
 
 
+pool=MPIPool()
 if not pool.is_master():
     pool.wait()
     sys.exit(0)
