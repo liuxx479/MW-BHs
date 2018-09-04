@@ -416,10 +416,10 @@ print batchname, 'total candidates: %s'%(len(apoid_candidates))
 pool.map(process_visit_fits, apoid_candidates)
 pool.close()
 
-if batch == 'kareem' or batch == 'kareem_YSradius':
-    os.system('rm /home1/02977/jialiu/ApogeeLine/binspec/spectral_model.py')
-    os.system('rm /home1/02977/jialiu/ApogeeLine/binspec/neural_nets')
-    os.system('ln -sf /home1/02977/jialiu/ApogeeLine/binspec/spectral_model_YST.py /home1/02977/jialiu/ApogeeLine/binspec/spectral_model.py')
-    os.system('ln -sf /home1/02977/jialiu/ApogeeLine/binspec/neural_nets_YST /home1/02977/jialiu/ApogeeLine/binspec/neural_nets')
+#if batch == 'kareem' or batch == 'kareem_YSradius':
+    #os.system('rm /home1/02977/jialiu/ApogeeLine/binspec/spectral_model.py')
+    #os.system('rm /home1/02977/jialiu/ApogeeLine/binspec/neural_nets')
+    #os.system('ln -sf /home1/02977/jialiu/ApogeeLine/binspec/spectral_model_YST.py /home1/02977/jialiu/ApogeeLine/binspec/spectral_model.py')
+    #os.system('ln -sf /home1/02977/jialiu/ApogeeLine/binspec/neural_nets_YST /home1/02977/jialiu/ApogeeLine/binspec/neural_nets')
     
 print 'done-done-done'
