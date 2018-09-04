@@ -57,22 +57,22 @@ batch = str(sys.argv[1])
 if batch == 'kareem':
     IDbinary_kareem = loadtxt(apodir+'Table_E3_all_binary_star_labels.csv',
                           dtype='|S25',usecols=[0,],delimiter=',')
-    
-    os.system('rm /home1/02977/jialiu/ApogeeLine/binspec/spectral_model.py')
-    os.system('rm /home1/02977/jialiu/ApogeeLine/binspec/neural_nets')
-    os.system('ln -sf /home1/02977/jialiu/ApogeeLine/binspec/spectral_model_Kareem.py /home1/02977/jialiu/ApogeeLine/binspec/spectral_model.py')
-    os.system('ln -sf /home1/02977/jialiu/ApogeeLine/binspec/neural_nets_kareem /home1/02977/jialiu/ApogeeLine/binspec/neural_nets')
+    if pool.is_master():
+        os.system('rm /home1/02977/jialiu/ApogeeLine/binspec/spectral_model.py')
+        os.system('rm /home1/02977/jialiu/ApogeeLine/binspec/neural_nets')
+        os.system('ln -sf /home1/02977/jialiu/ApogeeLine/binspec/spectral_model_Kareem.py /home1/02977/jialiu/ApogeeLine/binspec/spectral_model.py')
+        os.system('ln -sf /home1/02977/jialiu/ApogeeLine/binspec/neural_nets_kareem /home1/02977/jialiu/ApogeeLine/binspec/neural_nets')
     
     batchname=batch
 
 elif batch == 'kareem_YSradius':
     IDbinary_kareem = loadtxt(apodir+'Table_E3_all_binary_star_labels.csv',
                           dtype='|S25',usecols=[0,],delimiter=',')
-    
-    os.system('rm /home1/02977/jialiu/ApogeeLine/binspec/spectral_model.py')
-    os.system('rm /home1/02977/jialiu/ApogeeLine/binspec/neural_nets')
-    os.system('ln -sf /home1/02977/jialiu/ApogeeLine/binspec/spectral_model_Kareem.py /home1/02977/jialiu/ApogeeLine/binspec/spectral_model.py')
-    os.system('ln -sf /home1/02977/jialiu/ApogeeLine/binspec/neural_nets_kareem_YSTradius /home1/02977/jialiu/ApogeeLine/binspec/neural_nets')
+    if pool.is_master():
+        os.system('rm /home1/02977/jialiu/ApogeeLine/binspec/spectral_model.py')
+        os.system('rm /home1/02977/jialiu/ApogeeLine/binspec/neural_nets')
+        os.system('ln -sf /home1/02977/jialiu/ApogeeLine/binspec/spectral_model_Kareem.py /home1/02977/jialiu/ApogeeLine/binspec/spectral_model.py')
+        os.system('ln -sf /home1/02977/jialiu/ApogeeLine/binspec/neural_nets_kareem_YSTradius /home1/02977/jialiu/ApogeeLine/binspec/neural_nets')
     batchname=batch
     
 else:
