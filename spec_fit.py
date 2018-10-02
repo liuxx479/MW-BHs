@@ -399,7 +399,7 @@ def process_visit_fits(iapoid):
             if batch[:6]=='kareem':
                 os.system('echo %s\t%s\t%s\t%s\t%s\t%s >> /scratch/02977/jialiu/ApogeeLine/chi2_%s.txt'%(iapoid, Teff1, logg1, chi1, chi2, fimp, batch))
             else:
-                os.system('echo %s\t%s\t%s\t%s\t%s\t%s >> /scratch/02977/jialiu/ApogeeLine/chi2_all.txt'%(iapoid, Teff1, logg1, chi1, chi2, fimp))
+                os.system('echo %s\t%s\t%s\t%s\t%s\t%s >> /scratch/02977/jialiu/ApogeeLine/chi2_all_YST100nodes.txt'%(iapoid, Teff1, logg1, chi1, chi2, fimp))
             ########## make a plot for likely binary stars
             #if batch == 'test':
             #if maybebinary(chi1,chi2,fimp):
