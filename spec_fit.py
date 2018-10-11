@@ -49,14 +49,13 @@ batch = str(sys.argv[1])
     #apoid_candidates = all_giants[Nchunk*int(batch):Nchunk*(int(batch)+1)]
     #batchname = 'giants_'+batch
 
-
-
 #hdulist_visit = fits.open(apodir+'allVisit-l31c.2.fits')
 #out = [hdulist_visit[1].data[x] for x in ['APOGEE_ID','PLATE','MJD','FILE']]
 #save('ID_PLATE_MJD_FILE.npy',array(out).T)
 
 APOGEE_ID, PLATE, MJD, FILE = load(apodir+'ID_PLATE_MJD_FILE.npy').T
 
+plotonly = 0
 if batch == 'kareem':
     apoid_candidates = loadtxt(apodir+'Table_E3_all_binary_star_labels.csv',
                           dtype='|S25',usecols=[0,],delimiter=',')
@@ -68,9 +67,11 @@ if batch == 'kareem':
         #os.system('ln -sf /home1/02977/jialiu/ApogeeLine/binspec/neural_nets_kareem /home1/02977/jialiu/ApogeeLine/binspec/neural_nets')
     
     batchname=batch
+
 elif batch == 'test_NN':
     apoid_candidates = loadtxt(apodir+'oldgood_newbad_ids.txt')
     batchname=batch
+    plotonly = 1
     
 elif batch == 'kareem_YSradius':
     apoid_candidates = loadtxt(apodir+'Table_E3_all_binary_star_labels.csv',
@@ -257,7 +258,7 @@ def plot_visit_fits (iapoid, data_spec_arr, data_err_arr, single_spec, model_spe
 
 def plot_visit_fits_2comp (iapoid, data_spec_arr, data_err_arr, single_spec, model_specs2, 
                      date_arr, popt_single, popt2, ishow=0):
-    fnpath='/scratch/02977/jialiu/ApogeeLine/specs_fit_plot/Giants_MS/'
+    fnpath='/scratch/02977/jialiu/ApogeeLine/specs_fit_plot/'
     istep=0.3
     ledges = [[15140, 15810], [15850, 16435], [16470,16955]]
     dof = [len(array(data_spec_arr).flatten())- ix for ix in (len(popt_single), len(popt2))]
@@ -265,7 +266,7 @@ def plot_visit_fits_2comp (iapoid, data_spec_arr, data_err_arr, single_spec, mod
     chi1, chi2 = [sum((array(([single_spec, model_specs2][i])-array(data_spec_arr))/array(data_err_arr))**2)/dof[i] for i in range(2)]
     # record Teff vs chi2
     Teff1, logg1, feh, alphafe, vmacro1, dv1 = popt_single[:6]
-    os.system('echo %s\t%s\t%s\t%s >> /scratch/02977/jialiu/ApogeeLine/testNN.txt'%(iapoid, 
+    #os.system('echo %s\t%s\t%s\t%s >> /scratch/02977/jialiu/ApogeeLine/testNN.txt'%(iapoid, 
                                                     Teff1, logg1, chi1))
     
     f, axes=subplots(3,1,figsize=(12,8))
@@ -370,6 +371,7 @@ def process_visit_fits(iapoid):
         #date_arr=load(fitparams_dir+'%s/%s_date.npy'%(iapoid,iapoid))
         ##plot_visit_fits (iapoid, data_spec_arr, data_err_arr, single_spec, model_specs3, model_specs10, 
         ##             date_arr, popt_single, popt3, popt10)
+        
     out_arr = []
     os.system('mkdir -pv %s%s'%(fitparams_dir,iapoid))
     os.system('mkdir -pv %s%s'%(fitspecs_dir,iapoid))
@@ -409,15 +411,39 @@ def process_visit_fits(iapoid):
                 #plot_visit_fits_2comp (iapoid, data_spec_arr, data_err_arr, single_spec, model_specs, 
                      #date_arr, popt_single, popt, ishow=0)
 
-
 pool=MPIPool()
 if not pool.is_master():
     pool.wait()
     sys.exit(0)
 
 print batchname, 'total candidates: %s'%(len(apoid_candidates))
-pool.map(process_visit_fits, apoid_candidates)
-pool.close()
+
+
+if batch=='test_NN':
+    test_folder = '/scratch/02977/jialiu/ApogeeLine/nodes100_all/'
+    def plot_by_ID (iapoid):
+        fitparams_dir=test_folder+'specs_fit_params/batch_0/'
+        fitspecs_dir=test_folder+'specs_fit_specs/batch_0/'
+        ifn=fitspecs_dir+'%s/%s_N2_specs.npy'%(iapoid,iapoid)
+        iii=1
+        while not os.path.isfile(ifn) and iii<10: ######## i have to do this since i don't know which batch this ID is in
+            fitparams_dir=test_folder+'specs_fit_params/batch_%s/'%(iii)
+            fitspecs_dir=test_folder+'specs_fit_specs/batch_$s/'%(iii)
+            ifn=fitspecs_dir+'%s/%s_N2_specs.npy'%(iapoid,iapoid)
+            iii+=1
+        data_spec_arr, data_err_arr, single_spec, model_specs = load(ifn)
+        popt=load(fitparams_dir+'%s/%s_N2_params.npy'%(iapoid,iapoid))
+        popt_single=load(fitparams_dir+'%s/%s_N1_params.npy'%(iapoid,iapoid))
+        date_arr=load(fitparams_dir+'%s/%s_date.npy'%(iapoid,iapoid))
+        plot_visit_fits_2comp (iapoid, data_spec_arr, data_err_arr, single_spec, model_specs, 
+                     date_arr, popt_single, popt, ishow=0)
+
+    pool.map(plot_by_ID, apoid_candidates)    
+    pool.close()
+
+else:
+    pool.map(process_visit_fits, apoid_candidates)
+    pool.close()
 
 #if batch == 'kareem' or batch == 'kareem_YSradius':
     #os.system('rm /home1/02977/jialiu/ApogeeLine/binspec/spectral_model.py')
