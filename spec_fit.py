@@ -294,7 +294,7 @@ def plot_visit_fits_2comp (iapoid, data_spec_arr, data_err_arr, single_spec, mod
     if ishow: 
         show()
     else:
-        fnfig1='%s_fit.jpg'%(iapoid)
+        fnfig1='%s_fit_node100.jpg'%(iapoid)
         savefig(fnpath+fnfig1)
         close()
 
@@ -324,7 +324,7 @@ def plot_visit_fits_2comp (iapoid, data_spec_arr, data_err_arr, single_spec, mod
         show()
     else:
         
-        fnfig2='%s_diff.jpg'%(iapoid)
+        fnfig2='%s_diff_node100.jpg'%(iapoid)
         savefig(fnpath+fnfig2)
         close()
 
