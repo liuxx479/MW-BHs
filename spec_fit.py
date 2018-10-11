@@ -68,7 +68,10 @@ if batch == 'kareem':
         #os.system('ln -sf /home1/02977/jialiu/ApogeeLine/binspec/neural_nets_kareem /home1/02977/jialiu/ApogeeLine/binspec/neural_nets')
     
     batchname=batch
-
+elif batch == 'test_NN':
+    apoid_candidates = loadtxt(apodir+'oldgood_newbad_ids.txt')
+    batchname=batch
+    
 elif batch == 'kareem_YSradius':
     apoid_candidates = loadtxt(apodir+'Table_E3_all_binary_star_labels.csv',
                           dtype='|S25',usecols=[0,],delimiter=',')
