@@ -71,7 +71,6 @@ if batch == 'kareem':
 elif batch == 'test_NN':
     apoid_candidates = loadtxt(apodir+'oldgood_newbad_ids.txt')
     batchname=batch
-    plotonly = 1
     
 elif batch == 'kareem_YSradius':
     apoid_candidates = loadtxt(apodir+'Table_E3_all_binary_star_labels.csv',
@@ -267,7 +266,7 @@ def plot_visit_fits_2comp (iapoid, data_spec_arr, data_err_arr, single_spec, mod
     # record Teff vs chi2
     Teff1, logg1, feh, alphafe, vmacro1, dv1 = popt_single[:6]
     #os.system('echo %s\t%s\t%s\t%s >> /scratch/02977/jialiu/ApogeeLine/testNN.txt'%(iapoid, 
-                                                    Teff1, logg1, chi1))
+                                                    #Teff1, logg1, chi1))
     
     f, axes=subplots(3,1,figsize=(12,8))
     for j in range(len(date_arr)):        
