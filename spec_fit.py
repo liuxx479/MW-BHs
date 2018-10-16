@@ -69,6 +69,7 @@ if batch == 'kareem':
     batchname=batch
 
 elif batch == 'test_NN':
+    test_folder = '/scratch/02977/jialiu/ApogeeLine/nodes100_all/'
     apoid_candidates = loadtxt(apodir+'oldgood_newbad_ids.txt',dtype='str')
     batchname=batch
     
@@ -436,7 +437,6 @@ print batchname, 'total candidates: %s'%(len(apoid_candidates))
 
 
 if batch=='test_NN':
-    test_folder = '/scratch/02977/jialiu/ApogeeLine/nodes100_all/'
     pool.map(plot_by_ID, apoid_candidates)    
     pool.close()
 
