@@ -410,6 +410,23 @@ def process_visit_fits(iapoid):
                 #plot_visit_fits_2comp (iapoid, data_spec_arr, data_err_arr, single_spec, model_specs, 
                      #date_arr, popt_single, popt, ishow=0)
 
+def plot_by_ID (iapoid):
+    fitparams_dir=test_folder+'specs_fit_params/batch_0/'
+    fitspecs_dir=test_folder+'specs_fit_specs/batch_0/'
+    ifn=fitspecs_dir+'%s/%s_N2_specs.npy'%(iapoid,iapoid)
+    iii=1
+    while not os.path.isfile(ifn) and iii<10: ######## i have to do this since i don't know which batch this ID is in
+        fitparams_dir=test_folder+'specs_fit_params/batch_%s/'%(iii)
+        fitspecs_dir=test_folder+'specs_fit_specs/batch_$s/'%(iii)
+        ifn=fitspecs_dir+'%s/%s_N2_specs.npy'%(iapoid,iapoid)
+        iii+=1
+    data_spec_arr, data_err_arr, single_spec, model_specs = load(ifn)
+    popt=load(fitparams_dir+'%s/%s_N2_params.npy'%(iapoid,iapoid))
+    popt_single=load(fitparams_dir+'%s/%s_N1_params.npy'%(iapoid,iapoid))
+    date_arr=load(fitparams_dir+'%s/%s_date.npy'%(iapoid,iapoid))
+    plot_visit_fits_2comp (iapoid, data_spec_arr, data_err_arr, single_spec, model_specs, 
+                    date_arr, popt_single, popt, ishow=0)
+
 pool=MPIPool()
 if not pool.is_master():
     pool.wait()
@@ -420,23 +437,6 @@ print batchname, 'total candidates: %s'%(len(apoid_candidates))
 
 if batch=='test_NN':
     test_folder = '/scratch/02977/jialiu/ApogeeLine/nodes100_all/'
-    def plot_by_ID (iapoid):
-        fitparams_dir=test_folder+'specs_fit_params/batch_0/'
-        fitspecs_dir=test_folder+'specs_fit_specs/batch_0/'
-        ifn=fitspecs_dir+'%s/%s_N2_specs.npy'%(iapoid,iapoid)
-        iii=1
-        while not os.path.isfile(ifn) and iii<10: ######## i have to do this since i don't know which batch this ID is in
-            fitparams_dir=test_folder+'specs_fit_params/batch_%s/'%(iii)
-            fitspecs_dir=test_folder+'specs_fit_specs/batch_$s/'%(iii)
-            ifn=fitspecs_dir+'%s/%s_N2_specs.npy'%(iapoid,iapoid)
-            iii+=1
-        data_spec_arr, data_err_arr, single_spec, model_specs = load(ifn)
-        popt=load(fitparams_dir+'%s/%s_N2_params.npy'%(iapoid,iapoid))
-        popt_single=load(fitparams_dir+'%s/%s_N1_params.npy'%(iapoid,iapoid))
-        date_arr=load(fitparams_dir+'%s/%s_date.npy'%(iapoid,iapoid))
-        plot_visit_fits_2comp (iapoid, data_spec_arr, data_err_arr, single_spec, model_specs, 
-                     date_arr, popt_single, popt, ishow=0)
-
     pool.map(plot_by_ID, apoid_candidates)    
     pool.close()
 
