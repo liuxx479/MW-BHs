@@ -69,7 +69,7 @@ if batch == 'kareem':
     batchname=batch
 
 elif batch == 'test_NN':
-    apoid_candidates = loadtxt(apodir+'oldgood_newbad_ids.txt')
+    apoid_candidates = loadtxt(apodir+'oldgood_newbad_ids.txt',dtype='str')
     batchname=batch
     
 elif batch == 'kareem_YSradius':
