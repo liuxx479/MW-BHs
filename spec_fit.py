@@ -69,7 +69,7 @@ if batch == 'kareem':
     batchname=batch
 
 elif batch == 'test_NN':
-    test_folder = '/scratch/02977/jialiu/ApogeeLine/nodes100_all/'
+    test_folder = '/scratch/02977/jialiu/ApogeeLine/nodes10/'#nodes100_all/'
     apoid_candidates = loadtxt(apodir+'oldgood_newbad_ids.txt',dtype='str')
     batchname=batch
     
@@ -294,7 +294,7 @@ def plot_visit_fits_2comp (iapoid, data_spec_arr, data_err_arr, single_spec, mod
     if ishow: 
         show()
     else:
-        fnfig1='%s_fit_node100.jpg'%(iapoid)
+        fnfig1='%s_fit_node10.jpg'%(iapoid)
         savefig(fnpath+fnfig1)
         close()
 
@@ -324,7 +324,7 @@ def plot_visit_fits_2comp (iapoid, data_spec_arr, data_err_arr, single_spec, mod
         show()
     else:
         
-        fnfig2='%s_diff_node100.jpg'%(iapoid)
+        fnfig2='%s_diff_node10.jpg'%(iapoid)
         savefig(fnpath+fnfig2)
         close()
 
