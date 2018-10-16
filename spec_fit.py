@@ -418,7 +418,7 @@ def plot_by_ID (iapoid):
     iii=1
     while not os.path.isfile(ifn) and iii<10: ######## i have to do this since i don't know which batch this ID is in
         fitparams_dir=test_folder+'specs_fit_params/batch_%s/'%(iii)
-        fitspecs_dir=test_folder+'specs_fit_specs/batch_$s/'%(iii)
+        fitspecs_dir=test_folder+'specs_fit_specs/batch_%s/'%(iii)
         ifn=fitspecs_dir+'%s/%s_N2_specs.npy'%(iapoid,iapoid)
         iii+=1
     data_spec_arr, data_err_arr, single_spec, model_specs = load(ifn)
