@@ -378,8 +378,8 @@ def process_visit_fits(iapoid):
     for iN in list_components:
         #print iapoid, iN
         fn_components=fitparams_dir+'%s/%s_N%i_components.npy'%(iapoid,iapoid, iN)
-        if os.path.isfile(fn_components):
-            continue
+        #if os.path.isfile(fn_components):
+            #continue
         out = fit_visits(iapoid, N=iN)
         out_arr.append(out)
         ### save to files
@@ -404,7 +404,7 @@ def process_visit_fits(iapoid):
             if batch[:6]=='kareem':
                 os.system('echo %s\t%s\t%s\t%s\t%s\t%s >> /scratch/02977/jialiu/ApogeeLine/chi2_%s.txt'%(iapoid, Teff1, logg1, chi1, chi2, fimp, batch))
             else:
-                os.system('echo %s\t%s\t%s\t%s\t%s\t%s >> /scratch/02977/jialiu/ApogeeLine/chi2_all_YST100nodes_giantonly.txt'%(iapoid, Teff1, logg1, chi1, chi2, fimp))
+                os.system('echo %s\t%s\t%s\t%s\t%s\t%s\t%s\t%s >> /scratch/02977/jialiu/ApogeeLine/chi2_all_metal.txt'%(iapoid, Teff1, logg1, chi1, chi2, fimp,feh,alphafe))
             ########## make a plot for likely binary stars
             #if batch == 'test':
             #if maybebinary(chi1,chi2,fimp):
